@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VibOps — The AI Infrastructure Operating System</title>
+  <meta name="description" content="The AI Infrastructure Operating System for sovereign and enterprise GPU environments. Observe, operate, and optimize your entire GPU fleet from a single platform.">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0f;
+      --bg-card: #111118;
+      --border: #1e1e2e;
+      --accent: #7c6af7;
+      --accent-light: #9d8fff;
+      --fg: #e8e8f0;
+      --fg-subtle: #8888aa;
+      --fg-muted: #55556a;
+      --green: #22c55e;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* ── Nav ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 40px;
+      background: rgba(10,10,15,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      color: var(--fg);
+      text-decoration: none;
+    }
+
+    .logo span { color: var(--accent); }
+
+    nav a.nav-link {
+      font-size: 14px;
+      color: var(--fg-subtle);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    nav a.nav-link:hover { color: var(--fg); }
+
+    .nav-cta {
+      font-size: 13px;
+      padding: 7px 18px;
+      border-radius: 6px;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      text-decoration: none;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .nav-cta:hover { background: var(--accent); color: #fff; }
+
+    .nav-links { display: flex; align-items: center; gap: 32px; }
+
+    /* ── Hero ── */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 120px 24px 80px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -200px; left: 50%;
+      transform: translateX(-50%);
+      width: 800px; height: 800px;
+      background: radial-gradient(circle, rgba(124,106,247,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      color: var(--fg-subtle);
+      margin-bottom: 28px;
+      letter-spacing: 0.5px;
+    }
+
+    .badge-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    h1 {
+      font-size: clamp(36px, 6vw, 68px);
+      font-weight: 800;
+      letter-spacing: -2px;
+      line-height: 1.05;
+      max-width: 900px;
+      margin-bottom: 24px;
+    }
+
+    h1 em {
+      font-style: normal;
+      color: var(--accent-light);
+    }
+
+    .hero-sub {
+      font-size: clamp(16px, 2vw, 20px);
+      color: var(--fg-subtle);
+      max-width: 620px;
+      margin-bottom: 48px;
+      line-height: 1.7;
+    }
+
+    /* ── Waitlist form ── */
+    .waitlist-form {
+      display: flex;
+      gap: 10px;
+      max-width: 480px;
+      width: 100%;
+      margin-bottom: 16px;
+    }
+
+    .waitlist-form input {
+      flex: 1;
+      padding: 12px 16px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--fg);
+      font-size: 15px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .waitlist-form input:focus { border-color: var(--accent); }
+    .waitlist-form input::placeholder { color: var(--fg-muted); }
+
+    .btn-primary {
+      padding: 12px 24px;
+      border-radius: 8px;
+      background: var(--accent);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: opacity 0.2s;
+    }
+
+    .btn-primary:hover { opacity: 0.85; }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .form-note {
+      font-size: 12px;
+      color: var(--fg-muted);
+    }
+
+    .form-success {
+      display: none;
+      font-size: 14px;
+      color: var(--green);
+      padding: 12px 20px;
+      border: 1px solid rgba(34,197,94,0.3);
+      border-radius: 8px;
+      background: rgba(34,197,94,0.06);
+    }
+
+    /* ── MCP pill ── */
+    .mcp-pill {
+      margin-top: 48px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 20px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      font-size: 13px;
+      color: var(--fg-subtle);
+    }
+
+    .mcp-pill code {
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      color: var(--accent-light);
+      font-size: 13px;
+    }
+
+    .mcp-pill a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    /* ── Problem / Solution ── */
+    .section {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 100px 24px;
+    }
+
+    .section-label {
+      font-size: 12px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+
+    .section h2 {
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 700;
+      letter-spacing: -1px;
+      margin-bottom: 20px;
+      max-width: 700px;
+    }
+
+    .section p {
+      font-size: 18px;
+      color: var(--fg-subtle);
+      max-width: 620px;
+      line-height: 1.8;
+    }
+
+    /* ── Cards ── */
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      margin-top: 60px;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px;
+      transition: border-color 0.2s;
+    }
+
+    .card:hover { border-color: var(--accent); }
+
+    .card-icon {
+      font-size: 28px;
+      margin-bottom: 16px;
+    }
+
+    .card h3 {
+      font-size: 17px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      letter-spacing: -0.3px;
+    }
+
+    .card p {
+      font-size: 14px;
+      color: var(--fg-subtle);
+      line-height: 1.7;
+    }
+
+    /* ── How it works ── */
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+      margin-top: 60px;
+    }
+
+    .step {
+      padding: 24px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+    }
+
+    .step-num {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+    }
+
+    .step h3 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .step p {
+      font-size: 13px;
+      color: var(--fg-subtle);
+      line-height: 1.6;
+    }
+
+    .step code {
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 12px;
+      color: var(--accent-light);
+      background: rgba(124,106,247,0.1);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    /* ── Divider ── */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 0;
+    }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center;
+      padding: 40px 24px;
+      font-size: 13px;
+      color: var(--fg-muted);
+      border-top: 1px solid var(--border);
+    }
+
+    footer a { color: var(--fg-subtle); text-decoration: none; }
+    footer a:hover { color: var(--fg); }
+
+    @media (max-width: 600px) {
+      nav { padding: 14px 20px; }
+      .nav-links { gap: 16px; }
+      .waitlist-form { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav>
+  <a href="/" class="logo">Vib<span>Ops</span></a>
+  <div class="nav-links">
+    <a href="https://github.com/VibOpsai/vibops-mcp" class="nav-link" target="_blank">GitHub</a>
+    <a href="#waitlist" class="nav-cta">Request access</a>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="badge">
+    <span class="badge-dot"></span>
+    Early access — request an invite
+  </div>
+
+  <h1>The AI Infrastructure<br>Operating System for<br><em>sovereign GPU environments</em></h1>
+
+  <p class="hero-sub">
+    Enterprises managing GPU fleets across multiple clouds face fragmentation — different APIs, dashboards, and cost models for every provider. VibOps gives your team a single platform to observe, operate, and optimize the entire fleet.
+  </p>
+
+  <form class="waitlist-form" id="waitlistForm">
+    <input type="email" id="emailInput" placeholder="your@company.com" required autocomplete="email">
+    <button type="submit" class="btn-primary" id="submitBtn">Request access</button>
+  </form>
+  <p class="form-note">No spam. We'll reach out personally.</p>
+  <div class="form-success" id="formSuccess">
+    You're on the list. We'll be in touch shortly.
+  </div>
+
+  <div class="mcp-pill">
+    Open source MCP server available now —
+    <code>pip install vibops-mcp</code>
+    &nbsp;·&nbsp;
+    <a href="https://github.com/VibOpsai/vibops-mcp" target="_blank">GitHub ↗</a>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- Problem -->
+<div class="section">
+  <div class="section-label">The problem</div>
+  <h2>GPU infrastructure is fragmented by design</h2>
+  <p>AWS, GCP, Azure, on-prem, CoreWeave, DGX Cloud — each provider has its own API, its own dashboard, its own cost model. Correlating utilisation, cost, and workload type across providers means jumping between tools, exporting CSVs, and writing glue scripts.</p>
+
+  <div class="cards">
+    <div class="card">
+      <div class="card-icon">🔀</div>
+      <h3>Multi-provider chaos</h3>
+      <p>Your GPU fleet spans 3+ providers. No single view of utilisation, cost, or workload distribution across all of them.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🔍</div>
+      <h3>Invisible spend</h3>
+      <p>GPU hours are your biggest infrastructure cost. Without a unified cost model, you're flying blind on ROI per workload.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">⚡</div>
+      <h3>Slow incident response</h3>
+      <p>A GPU saturation alert fires. Your engineer needs 4 tools and 20 minutes to diagnose and remediate. Every minute costs money.</p>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- Solution -->
+<div class="section">
+  <div class="section-label">The solution</div>
+  <h2>One platform. Any cloud. Any cluster.</h2>
+  <p>VibOps is the provider-agnostic layer that unifies your GPU fleet. Observe every cluster, control every workload, and track every dollar — from a single interface your AI assistant can operate directly.</p>
+
+  <div class="cards">
+    <div class="card">
+      <div class="card-icon">👁</div>
+      <h3>Unified observability</h3>
+      <p>GPU utilisation, workload breakdown, cost per cluster, MTTR — aggregated across every provider in real time.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🤖</div>
+      <h3>AI-native operations</h3>
+      <p>Your team uses Claude Desktop or Cursor to deploy models, scale clusters, and investigate incidents — no context switching.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🔒</div>
+      <h3>Sovereign by design</h3>
+      <p>Deploy on your infrastructure. Your data never leaves your environment. Built for regulated industries and sovereign cloud requirements.</p>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- How it works -->
+<div class="section">
+  <div class="section-label">How it works</div>
+  <h2>Up and running in minutes</h2>
+  <p>VibOps deploys as a lightweight control plane next to your existing infrastructure. No agents on GPU nodes, no data exfiltration.</p>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">01</div>
+      <h3>Deploy VibOps</h3>
+      <p>Self-hosted on your infrastructure via Helm or Docker Compose. Connects to your clusters via lightweight gateways.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">02</div>
+      <h3>Install the MCP server</h3>
+      <p><code>pip install vibops-mcp</code> — configure Claude Desktop or Cursor with your VibOps URL and API token.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">03</div>
+      <h3>Operate in natural language</h3>
+      <p>Ask your AI assistant to show GPU utilisation, deploy a model, or investigate a cost spike — across any provider.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">04</div>
+      <h3>Full audit trail</h3>
+      <p>Every operation is logged. Every action is reversible. Enterprise governance built in from day one.</p>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- Final CTA -->
+<div class="section" id="waitlist" style="text-align:center; padding-bottom: 120px;">
+  <div class="section-label">Early access</div>
+  <h2 style="max-width:100%">Built for teams that take<br>GPU infrastructure seriously</h2>
+  <p style="margin: 16px auto 40px; max-width: 500px;">We're onboarding a limited number of enterprise and CSP partners. Request access and we'll reach out personally.</p>
+
+  <form class="waitlist-form" id="waitlistForm2" style="margin: 0 auto 12px;">
+    <input type="email" id="emailInput2" placeholder="your@company.com" required autocomplete="email">
+    <button type="submit" class="btn-primary" id="submitBtn2">Request access</button>
+  </form>
+  <p class="form-note">Or reach us directly at <a href="mailto:hello@vibops.ai" style="color:var(--fg-subtle)">hello@vibops.ai</a></p>
+  <div class="form-success" id="formSuccess2">
+    You're on the list. We'll be in touch shortly.
+  </div>
+</div>
+
+<!-- Footer -->
+<footer>
+  <div style="margin-bottom: 12px;">
+    <a href="https://github.com/VibOpsai/vibops-mcp" target="_blank">GitHub</a>
+    &nbsp;·&nbsp;
+    <a href="mailto:hello@vibops.ai">hello@vibops.ai</a>
+  </div>
+  © 2026 VibOps SAS — The AI Infrastructure Operating System
+</footer>
+
+<script>
+  function handleForm(formId, emailId, btnId, successId) {
+    const form = document.getElementById(formId);
+    const email = document.getElementById(emailId);
+    const btn = document.getElementById(btnId);
+    const success = document.getElementById(successId);
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      btn.disabled = true;
+      btn.textContent = 'Sending…';
+
+      // Submit to Formspree (replace FORM_ID with your Formspree form ID)
+      try {
+        const r = await fetch('https://formspree.io/f/xkokbpby', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({ email: email.value }),
+        });
+        if (r.ok) {
+          form.style.display = 'none';
+          success.style.display = 'block';
+        } else {
+          btn.disabled = false;
+          btn.textContent = 'Request access';
+          alert('Something went wrong. Please email us at hello@vibops.ai');
+        }
+      } catch {
+        btn.disabled = false;
+        btn.textContent = 'Request access';
+        window.location.href = 'mailto:hello@vibops.ai?subject=VibOps access request&body=Email: ' + email.value;
+      }
+    });
+  }
+
+  handleForm('waitlistForm', 'emailInput', 'submitBtn', 'formSuccess');
+  handleForm('waitlistForm2', 'emailInput2', 'submitBtn2', 'formSuccess2');
+</script>
+
+</body>
+</html>
