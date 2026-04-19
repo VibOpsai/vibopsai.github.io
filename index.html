@@ -505,7 +505,7 @@
     <input type="email" id="emailInput2" placeholder="your@company.com" required autocomplete="email">
     <button type="submit" class="btn-primary" id="submitBtn2">Request access</button>
   </form>
-  <p class="form-note">Or reach us directly at <a href="mailto:hello@vibops.ai" style="color:var(--fg-subtle)">hello@vibops.ai</a></p>
+  <p class="form-note">No spam. We'll reach out personally.</p>
   <div class="form-success" id="formSuccess2">
     You're on the list. We'll be in touch shortly.
   </div>
@@ -544,12 +544,12 @@
         } else {
           btn.disabled = false;
           btn.textContent = 'Request access';
-          alert('Something went wrong. Please email us at hello@vibops.ai');
+          alert('Something went wrong. Please try again.');
         }
       } catch {
         btn.disabled = false;
         btn.textContent = 'Request access';
-        window.location.href = 'mailto:hello@vibops.ai?subject=VibOps access request&body=Email: ' + email.value;
+        btn.textContent = 'Try again';
       }
     });
   }
