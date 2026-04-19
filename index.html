@@ -344,6 +344,47 @@
       border-radius: 4px;
     }
 
+    /* ── Demo video ── */
+    .demo-section {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 80px 24px;
+      text-align: center;
+    }
+
+    .demo-section .section-label { margin-bottom: 16px; }
+
+    .demo-section h2 {
+      font-size: clamp(24px, 3.5vw, 38px);
+      font-weight: 700;
+      letter-spacing: -1px;
+      margin-bottom: 12px;
+    }
+
+    .demo-section p {
+      font-size: 16px;
+      color: var(--fg-subtle);
+      margin-bottom: 40px;
+    }
+
+    .video-wrapper {
+      position: relative;
+      width: 100%;
+      padding-top: 56.25%; /* 16:9 */
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: #000;
+    }
+
+    .video-wrapper iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
     /* ── Divider ── */
     .divider {
       border: none;
@@ -406,6 +447,23 @@
     <a href="https://github.com/VibOpsai/vibops-mcp" target="_blank">GitHub ↗</a>
   </div>
 </section>
+
+<hr class="divider">
+
+<!-- Demo -->
+<div class="demo-section">
+  <div class="section-label">See it in action</div>
+  <h2>From conversation to production in minutes</h2>
+  <p>Live kubectl, Helm, and pipeline promotion — no terminal opened.</p>
+  <div class="video-wrapper">
+    <iframe
+      src="https://www.youtube.com/embed/j_nz-VnVPxc"
+      title="VibOps MCP Full Demo"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+      allowfullscreen>
+    </iframe>
+  </div>
+</div>
 
 <hr class="divider">
 
