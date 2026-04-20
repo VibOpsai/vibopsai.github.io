@@ -385,6 +385,49 @@
       border: none;
     }
 
+    /* ── Console screenshot ── */
+    .console-section {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px 80px;
+      text-align: center;
+    }
+
+    .console-label {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--fg-muted);
+      margin-bottom: 12px;
+    }
+
+    .console-section h2 {
+      font-size: clamp(22px, 3vw, 32px);
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-bottom: 10px;
+    }
+
+    .console-section > p {
+      font-size: 15px;
+      color: var(--fg-subtle);
+      margin-bottom: 32px;
+    }
+
+    .console-img-wrapper {
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      box-shadow: 0 24px 80px rgba(0,0,0,0.5);
+    }
+
+    .console-img-wrapper img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
     /* ── Divider ── */
     .divider {
       border: none;
@@ -462,6 +505,16 @@
       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
       allowfullscreen>
     </iframe>
+  </div>
+</div>
+
+<!-- Console screenshot -->
+<div class="console-section">
+  <div class="console-label">The platform</div>
+  <h2>The full AI Infrastructure Console</h2>
+  <p>Deployments, automations, secrets, LLM metrics, and your AI agent — all in one place.</p>
+  <div class="console-img-wrapper">
+    <img src="console-screenshot.jpg" alt="VibOps AI Infrastructure Console showing llama3 deployment with recent activity, cluster status, and AI agent conversation" loading="lazy">
   </div>
 </div>
 
