@@ -682,7 +682,7 @@
 <!-- Proof bar -->
 <div class="proof-bar">
   <div class="proof-item">🔒 <span>Fully self-hosted</span> — your data stays in your infra</div>
-  <div class="proof-item">⚡ <span>Live kubectl</span> — not a cached snapshot</div>
+  <div class="proof-item">⚡ <span>Live cluster state</span> — not a cached snapshot</div>
   <div class="proof-item">📋 <span>Immutable audit trail</span> — every action logged</div>
   <div class="proof-item">🌍 <span>Air-gap ready</span> — on-prem LLM supported</div>
 </div>
@@ -845,7 +845,7 @@
   <h2>Built for two segments that own GPU infrastructure</h2>
   <p>VibOps deploys inside your client's infrastructure — one instance per client, fully under their control. Not a SaaS platform you connect to.</p>
 
-  <div class="cards-2col">
+  <div class="cards-2col" style="grid-template-columns:repeat(auto-fit,minmax(320px,1fr))">
     <div class="segment-card">
       <h3>🏢 Cloud Service Providers</h3>
       <p class="segment-who">Outscale, OVH, Scaleway, CoreWeave, regional GPU clouds — any CSP reselling GPU capacity</p>
@@ -860,6 +860,18 @@
         <div class="wl-label">White-label ready</div>
         <p>Your brand. Your console. Your pricing. VibOps deploys as a backend that powers your existing customer portal — or as a fully white-labeled console under your domain. Configure markup per accelerator type, per customer segment, or per workload. Built-in chargeback reports per customer. RGPD-compliant data isolation between you, your customers, and our engineering team.</p>
       </div>
+    </div>
+
+    <div class="segment-card">
+      <h3>🏭 GPU Datacenter Operators</h3>
+      <p class="segment-who">HPC centers, national compute programs, colocation providers evolving toward managed AI services</p>
+      <p>You own the hardware. VibOps gives you the operations layer to turn raw compute into a managed AI infrastructure service — without building an MLOps platform from scratch.</p>
+      <ul class="value-list">
+        <li>Unified operations across heterogeneous accelerator fleets (NVIDIA + AMD + Intel in the same datacenter)</li>
+        <li>Tenant isolation and per-customer FinOps out of the box</li>
+        <li>Offer clients a managed GPU service with full auditability — not just raw access</li>
+        <li>On-prem deployment with no data leaving your facility</li>
+      </ul>
     </div>
 
     <div class="segment-card">
