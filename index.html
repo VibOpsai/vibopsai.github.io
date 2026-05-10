@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VibOps — The unified operations platform for multi-vendor GPU infrastructure</title>
-  <meta name="description" content="Operate your GPU fleet at conversation speed — without leaving your stack. VibOps amplifies your MLOps and SRE teams across NVIDIA, AMD, Intel Gaudi, AWS Trainium, Google TPU, and Groq. Self-hosted. Audit-ready. Sovereign.">
+  <title>VibOps — AI GPU orchestration for datacenters, CSPs, and enterprises</title>
+  <meta name="description" content="One platform across every GPU vendor: NVIDIA, AMD, Intel Gaudi, AWS Trainium, Google TPU, Groq. Built for GPU datacenter operators, Cloud Service Providers, and large enterprises. Self-hosted. Audit-ready. Sovereign.">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -143,7 +143,7 @@
     .hero-sub {
       font-size: clamp(15px, 1.8vw, 18px);
       color: var(--fg-subtle);
-      max-width: 640px;
+      max-width: 660px;
       margin-bottom: 28px;
       line-height: 1.7;
     }
@@ -207,30 +207,32 @@
       background: rgba(63,185,80,0.06);
     }
 
-    /* ── MCP pill ── */
-    .mcp-pill {
-      margin-top: 24px;
+    /* ── Vendor pill row ── */
+    .vendor-pill-row {
+      margin-top: 28px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .vendor-pill {
       display: inline-flex;
       align-items: center;
-      gap: 10px;
-      padding: 10px 20px;
-      border-radius: 8px;
+      gap: 5px;
+      padding: 5px 14px;
+      border-radius: 20px;
       border: 1px solid var(--border);
       background: var(--bg-card);
-      font-size: 13px;
+      font-size: 12px;
       color: var(--fg-subtle);
-    }
-
-    .mcp-pill code {
-      font-family: 'SF Mono', 'Fira Code', monospace;
-      color: var(--accent-light);
-      font-size: 13px;
-    }
-
-    .mcp-pill a {
-      color: var(--accent);
-      text-decoration: none;
       font-weight: 500;
+    }
+
+    .vendor-pill-sep {
+      color: var(--fg-muted);
+      font-size: 13px;
     }
 
     /* ── Proof bar ── */
@@ -359,6 +361,75 @@
       line-height: 1.7;
     }
 
+    /* ── Patchwork section ── */
+    .patchwork-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-top: 48px;
+    }
+
+    .patchwork-cell {
+      background: var(--bg-card);
+      padding: 24px 28px;
+    }
+
+    .patchwork-cell .vendor-tag {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--fg-muted);
+      margin-bottom: 10px;
+    }
+
+    .patchwork-cell h4 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--fg);
+    }
+
+    .patchwork-cell p {
+      font-size: 13px;
+      color: var(--fg-subtle);
+      line-height: 1.6;
+    }
+
+    .patchwork-arrow {
+      text-align: center;
+      padding: 32px 0 16px;
+      font-size: 22px;
+      color: var(--fg-muted);
+    }
+
+    .patchwork-solution {
+      background: rgba(88,166,255,0.06);
+      border: 1px solid rgba(88,166,255,0.25);
+      border-radius: 12px;
+      padding: 32px 36px;
+      text-align: center;
+      margin-top: 0;
+    }
+
+    .patchwork-solution p {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--fg);
+      line-height: 1.5;
+      letter-spacing: -0.3px;
+    }
+
+    .patchwork-solution p em {
+      font-style: normal;
+      color: var(--accent);
+    }
+
     /* ── Multi-vendor section ── */
     .multivendor-section {
       max-width: 1100px;
@@ -408,12 +479,64 @@
 
     .multivendor-note strong { color: var(--fg); }
 
+    /* ── Safety section ── */
+    .safety-section {
+      background: var(--bg-card);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .safety-section .section {
+      padding-top: 80px;
+      padding-bottom: 80px;
+    }
+
+    .safety-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-top: 48px;
+    }
+
+    .safety-item {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      padding: 20px 24px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+    }
+
+    .safety-icon {
+      font-size: 22px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .safety-item h4 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .safety-item p {
+      font-size: 13px;
+      color: var(--fg-subtle);
+      line-height: 1.6;
+    }
+
     /* ── Segment cards ── */
     .segment-card {
       background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: 12px;
       padding: 32px;
+    }
+
+    .segment-card.featured {
+      border-color: rgba(88,166,255,0.4);
+      background: linear-gradient(135deg, rgba(88,166,255,0.04) 0%, var(--bg-card) 60%);
     }
 
     .segment-card h3 {
@@ -651,15 +774,13 @@
 <section class="hero">
   <div class="badge">
     <span class="badge-dot"></span>
-    Open source MCP Server — MIT License
+    AI GPU Orchestration · Multi-OEM · Self-hosted
   </div>
 
-  <h1>Your stack. Your team.<br><em>Operations accelerated.</em></h1>
+  <h1>One platform.<br><em>Every GPU vendor.</em><br>Every cluster.</h1>
 
   <p class="hero-sub">
-    VibOps is the conversational operations layer that amplifies your MLOps and SRE teams.
-    Deploy models, diagnose incidents, manage costs, and promote to production — in natural language,
-    with the tools your team already knows. Every action audited. Your data never leaves your infrastructure.
+    VibOps is the AI-native orchestration layer for any organization running GPU infrastructure. Tell it what you want in plain English — it handles the rest across your entire fleet: NVIDIA, AMD, Intel, AWS, Google, Groq. Audit-ready, sovereign, multi-tenant.
   </p>
 
   <form class="waitlist-form" id="waitlistForm">
@@ -671,19 +792,27 @@
     You're on the list. We'll be in touch shortly.
   </div>
 
-  <div class="mcp-pill">
-    Open source MCP server —
-    <code>pip install vibops-mcp</code>
-    &nbsp;·&nbsp;
-    <a href="https://github.com/VibOpsai/vibops-mcp" target="_blank">GitHub ↗</a>
+  <div class="vendor-pill-row">
+    <div class="vendor-pill">NVIDIA H100 · H200 · Blackwell</div>
+    <span class="vendor-pill-sep">·</span>
+    <div class="vendor-pill">AMD MI300X</div>
+    <span class="vendor-pill-sep">·</span>
+    <div class="vendor-pill">Intel Gaudi 3</div>
+    <span class="vendor-pill-sep">·</span>
+    <div class="vendor-pill">AWS Trainium</div>
+    <span class="vendor-pill-sep">·</span>
+    <div class="vendor-pill">Google TPU</div>
+    <span class="vendor-pill-sep">·</span>
+    <div class="vendor-pill">Groq LPU</div>
   </div>
 </section>
 
 <!-- Proof bar -->
 <div class="proof-bar">
+  <div class="proof-item">🌐 <span>6 GPU vendors</span> — one unified interface</div>
   <div class="proof-item">🔒 <span>Fully self-hosted</span> — your data stays in your infra</div>
-  <div class="proof-item">⚡ <span>Live cluster state</span> — not a cached snapshot</div>
   <div class="proof-item">📋 <span>Immutable audit trail</span> — every action logged</div>
+  <div class="proof-item">🏢 <span>Multi-tenant</span> — datacenter, CSP, enterprise-ready</div>
   <div class="proof-item">🌍 <span>Air-gap ready</span> — on-prem LLM supported</div>
 </div>
 
@@ -693,9 +822,9 @@
     🔓 MIT License &nbsp;·&nbsp;
     <a href="https://github.com/VibOpsai/vibops-mcp" target="_blank">vibops-mcp on GitHub ↗</a>
   </div>
-  <div class="oss-item">✅ 1000+ automated tests</div>
+  <div class="oss-item">✅ ~3,843 automated tests</div>
+  <div class="oss-item">🔐 pip-audit + Trivy CVE scanning on every commit</div>
   <div class="oss-item">📦 Weekly releases</div>
-  <div class="oss-item">🔌 MCP-compatible — works with Claude Desktop, Cursor, and any MCP client</div>
 </div>
 
 <hr class="divider">
@@ -704,11 +833,11 @@
 <div class="demo-section">
   <div class="section-label">See it in action</div>
   <h2>From conversation to production in minutes</h2>
-  <p>Live cluster inspection, data-driven scaling, full pipeline promotion — every step audited.</p>
+  <p>Live cluster inspection, data-driven scaling, full pipeline promotion — every step audited across any GPU vendor.</p>
   <div class="video-wrapper">
     <iframe
       src="https://www.youtube.com/embed/j_nz-VnVPxc"
-      title="VibOps — Conversational GPU infrastructure operations"
+      title="VibOps — AI GPU orchestration across every vendor"
       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
       allowfullscreen>
     </iframe>
@@ -718,8 +847,8 @@
 <!-- Console screenshot -->
 <div class="console-section">
   <div class="console-label">The platform</div>
-  <h2>Everything your team needs to operate GPU infrastructure</h2>
-  <p>Agent console, cluster monitoring, pipelines, FinOps, secrets, and audit — in one place.</p>
+  <h2>Everything your team needs to operate a GPU datacenter</h2>
+  <p>Fleet view, agent console, FinOps, multi-tenant isolation, pipelines, and audit — in one place.</p>
   <div class="console-img-wrapper">
     <img src="console-screenshot.jpg" alt="VibOps console showing GPU fleet status, agent conversation, and pipeline promotion" loading="lazy">
   </div>
@@ -727,28 +856,42 @@
 
 <hr class="divider">
 
-<!-- Problem -->
+<!-- Problem — the patchwork -->
 <div class="section">
   <div class="section-label">The problem</div>
-  <h2>Expert knowledge shouldn't be a single point of failure</h2>
-  <p>A GPU fleet requires deep expertise — Kubernetes, NVIDIA stack, cost models, incident correlation across a dozen tools. When your senior SRE is unavailable, the team slows down. When incidents fire at 2 AM, every minute of diagnostic costs real money.</p>
+  <h2>GPU infrastructure runs on a patchwork of vendor-specific tools</h2>
+  <p>Every accelerator vendor ships its own CLI, its own dashboard, its own metrics stack. Whether you run a datacenter, a CSP, or an enterprise AI platform, managing a heterogeneous fleet means maintaining parallel workflows — and parallel skill sets.</p>
 
-  <div class="cards">
-    <div class="card">
-      <div class="card-icon">🔧</div>
-      <h3>Expertise bottleneck</h3>
-      <p>kubectl, Helm, DCGM, MIG, ArgoCD — mastering the stack takes months. Operations depend on the people who have done it before, not on documented, repeatable workflows.</p>
+  <div class="patchwork-grid">
+    <div class="patchwork-cell">
+      <div class="vendor-tag">NVIDIA</div>
+      <h4>kubectl + DCGM + MIG scripts</h4>
+      <p>Custom bash scripts for partitioning, DCGM exporter for metrics, manual MIG profiles per node. Works — but only for NVIDIA engineers.</p>
     </div>
-    <div class="card">
-      <div class="card-icon">⏱</div>
-      <h3>Incidents are slow to diagnose</h3>
-      <p>A GPU saturation alert fires. Correlating logs, metrics, events, and deployment state across 4 tools takes 20 minutes before the first action. Every minute costs money.</p>
+    <div class="patchwork-cell">
+      <div class="vendor-tag">AMD</div>
+      <h4>ROCm stack + custom exporters</h4>
+      <p>Different driver model, different metric names, different partitioning (SPX/DPX/QPX). Separate documentation, separate on-call runbook.</p>
     </div>
-    <div class="card">
-      <div class="card-icon">💸</div>
-      <h3>GPU waste is invisible until the bill arrives</h3>
-      <p>Idle GPUs, over-provisioned replicas, orphaned workloads — at $2–8/GPU/hour, waste compounds silently. Without a FinOps layer, you're flying blind on actual ROI.</p>
+    <div class="patchwork-cell">
+      <div class="vendor-tag">Intel / AWS / Google</div>
+      <h4>Vendor SDKs, each its own API</h4>
+      <p>Gaudi SynapseAI, Neuron SDK for Trainium, TPU topology flags — each accelerator speaks a different language to the control plane.</p>
     </div>
+    <div class="patchwork-cell">
+      <div class="vendor-tag">FinOps</div>
+      <h4>Spreadsheets + manual export</h4>
+      <p>No unified cost model across vendors. Chargeback is a monthly copy-paste exercise. Waste is invisible until the invoice arrives.</p>
+    </div>
+  </div>
+
+  <div class="patchwork-arrow">↓</div>
+
+  <div class="patchwork-solution">
+    <p>
+      <em>One interface, one vocabulary, one audit trail</em><br>
+      across every GPU vendor, every cluster, every customer.
+    </p>
   </div>
 </div>
 
@@ -757,51 +900,107 @@
 <!-- Solution -->
 <div class="section">
   <div class="section-label">The solution</div>
-  <h2>The intelligence layer on top of your GPU stack</h2>
-  <p>VibOps encodes GPU/AI infrastructure expertise into a conversational operations platform. Your team works in natural language — VibOps translates every intent into the right kubectl, Helm, or API call, with guardrails that protect production from mistakes.</p>
+  <h2>Orchestration that works the same, regardless of vendor</h2>
+  <p>VibOps exposes 11 unified accelerator operations — deploy, diagnose, partition, cost-estimate, detect waste — that work identically across NVIDIA, AMD, Intel, AWS, Google, and Groq. One conversation replaces six vendor runbooks.</p>
 
   <div class="cards">
     <div class="card">
+      <div class="card-icon">🌐</div>
+      <h3>Unified accelerator API</h3>
+      <p>11 vendor-agnostic operations: deploy, diagnose, partition, benchmark, cost-estimate, detect waste. The same command that scales NVIDIA H100s works on AMD MI300X and Intel Gaudi without rewriting a script.</p>
+    </div>
+    <div class="card">
       <div class="card-icon">🤖</div>
-      <h3>Conversational operations</h3>
-      <p>Deploy models, scale clusters, diagnose incidents, promote pipelines — from a conversation. Your kubectl runs. Your Helm deploys. The agent handles the orchestration.</p>
+      <h3>Natural language operations</h3>
+      <p>Operators describe what they want in plain language. VibOps translates every intent into the right kubectl, Helm, or vendor SDK call — with confirmation gates before anything destructive runs.</p>
     </div>
     <div class="card">
-      <div class="card-icon">🛡</div>
-      <h3>Production guardrails</h3>
-      <p>Destructive actions require explicit confirmation. Production namespaces are protected by team scopes. Guardrails are enforced at the engine level, not the UI level.</p>
+      <div class="card-icon">💸</div>
+      <h3>FinOps across all vendors</h3>
+      <p>Unified cost model with per-vendor pricing, idle GPU detection, budget alerts, and per-tenant chargeback reports — automatically, from the same platform that runs operations.</p>
     </div>
     <div class="card">
-      <div class="card-icon">💡</div>
-      <h3>FinOps built in</h3>
-      <p>Idle GPU detection, budget alerts, per-team chargeback reports — the platform surfaces waste before it compounds and gives finance teams the data they need.</p>
-    </div>
-    <div class="card">
-      <div class="card-icon">🧠</div>
-      <h3>Memory across sessions</h3>
-      <p>The agent remembers your infrastructure context. Every morning, a brief surfaces anomalies, cost trends, and pending actions — without you having to ask.</p>
-    </div>
-    <div class="card">
-      <div class="card-icon">🔒</div>
-      <h3>Sovereign by design</h3>
-      <p>Deployed inside your infrastructure. Cluster state, credentials, and audit logs never leave your perimeter. On-prem LLM supported for fully air-gapped deployments.</p>
+      <div class="card-icon">🏢</div>
+      <h3>Multi-tenant by default</h3>
+      <p>Full tenant isolation at the row level. One VibOps instance serves multiple customers without data leakage. Per-customer FinOps, quotas, rate limiting, and audit trails out of the box.</p>
     </div>
     <div class="card">
       <div class="card-icon">⚙️</div>
       <h3>Automation pipelines</h3>
-      <p>Define multi-step promotion workflows with rollback guards. Staging → health check → production → verify — triggered from a conversation, audited at every step.</p>
+      <p>Multi-step workflows with rollback guards — triggered by events, schedules, or alerts. Staging → health check → production → verify: orchestrated in a conversation, audited at every step.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🔌</div>
+      <h3>Connect Gateway</h3>
+      <p>Lightweight agent deployed at each site. Supports air-gapped clusters, remote datacenters, and client-managed infrastructure — all visible from one control plane.</p>
     </div>
   </div>
 </div>
 
 <hr class="divider">
 
+<!-- Safety section -->
+<div class="safety-section">
+  <div class="section">
+    <div class="section-label">Built for critical infrastructure</div>
+    <h2>Why it's safe to run critical workloads on VibOps</h2>
+    <p style="font-size:17px;color:var(--fg-subtle);max-width:620px;line-height:1.8">
+      Running GPU workloads in production means every mistake is expensive. VibOps is designed with five independent safety layers so that no single misconfiguration or misrouted command can damage your fleet.
+    </p>
+
+    <div class="safety-grid">
+      <div class="safety-item">
+        <div class="safety-icon">🛡</div>
+        <div>
+          <h4>Confirmation before destruction</h4>
+          <p>Every destructive action — scale-down, delete, partition — requires explicit operator confirmation. The platform shows a dry-run preview first. You can't break production by accident.</p>
+        </div>
+      </div>
+      <div class="safety-item">
+        <div class="safety-icon">📋</div>
+        <div>
+          <h4>Immutable audit trail</h4>
+          <p>Every operation is logged: who ran it, when, what parameters, what the outcome was. Tamper-proof. SOC 2 ready. Exportable for compliance review.</p>
+        </div>
+      </div>
+      <div class="safety-item">
+        <div class="safety-icon">🔐</div>
+        <div>
+          <h4>Policy engine — default deny</h4>
+          <p>Every action must be declared in the tool catalog before it can execute. Unknown operations return a 403. A new vendor connector adds zero attack surface unless explicitly registered.</p>
+        </div>
+      </div>
+      <div class="safety-item">
+        <div class="safety-icon">🏠</div>
+        <div>
+          <h4>Sovereign — data never leaves your perimeter</h4>
+          <p>Deployed inside your own infrastructure. Cluster state, credentials, and operator conversations stay in your network. On-prem LLM supported for fully air-gapped operation.</p>
+        </div>
+      </div>
+      <div class="safety-item">
+        <div class="safety-icon">🔒</div>
+        <div>
+          <h4>Tenant isolation</h4>
+          <p>Every read and write is scoped to the authenticated organization — enforced at the service layer, not just at the API boundary. Cross-tenant data access is structurally impossible.</p>
+        </div>
+      </div>
+      <div class="safety-item">
+        <div class="safety-icon">🧪</div>
+        <div>
+          <h4>~3,843 automated tests + CVE scanning</h4>
+          <p>Connector tests, behavioral tests, security tests. pip-audit and Trivy scan every dependency on every commit — HIGH and CRITICAL CVEs block the build before they reach production.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Multi-vendor — the real differentiator -->
 <div class="multivendor-section">
-  <div class="section-label">Multi-vendor by design</div>
-  <h2>The only operations platform that speaks natively to every accelerator</h2>
+  <div class="section-label">Multi-OEM by design</div>
+  <h2>The only orchestration platform that speaks natively to every accelerator</h2>
   <p style="font-size:18px;color:var(--fg-subtle);max-width:640px;line-height:1.8;margin-bottom:0">
-    Most GPU operations tools are NVIDIA-centric. VibOps was built from the ground up to support the full accelerator landscape — one unified interface, one conversational vocabulary, one audit trail across all of them.
+    Most GPU operations tools are NVIDIA-centric. VibOps was built from the ground up to support the full accelerator landscape — each connector implements the same vendor-agnostic interface, so the same workflow that works on H100s works on MI300X, Gaudi 3, and Trainium.
   </p>
 
   <div class="vendor-grid">
@@ -811,29 +1010,29 @@
     </div>
     <div class="vendor-chip">
       <div class="vendor-name">AMD</div>
-      <div class="vendor-models">MI300X · MI325X<br>ROCm stack</div>
+      <div class="vendor-models">MI300X · MI325X<br>ROCm · SPX/DPX/QPX</div>
     </div>
     <div class="vendor-chip">
       <div class="vendor-name">Intel</div>
-      <div class="vendor-models">Gaudi 3<br>SynapseAI</div>
+      <div class="vendor-models">Gaudi 3<br>SynapseAI · GAUDI_* metrics</div>
     </div>
     <div class="vendor-chip">
       <div class="vendor-name">AWS</div>
-      <div class="vendor-models">Trainium<br>Inferentia</div>
+      <div class="vendor-models">Trainium · Inferentia<br>Neuron SDK · Trn1/Trn2</div>
     </div>
     <div class="vendor-chip">
       <div class="vendor-name">Google</div>
-      <div class="vendor-models">TPU v5e · v5p<br>v6 Trillium</div>
+      <div class="vendor-models">TPU v5e · v5p · v6e<br>Topology-aware · GKE</div>
     </div>
     <div class="vendor-chip">
       <div class="vendor-name">Groq</div>
-      <div class="vendor-models">LPU<br>GroqCloud</div>
+      <div class="vendor-models">LPU · GroqCloud<br>Per-token cost model</div>
     </div>
   </div>
 
   <div class="multivendor-note">
     <strong>No vendor lock-in. Sovereign-friendly by construction.</strong><br>
-    European CSPs, defence contractors, and sovereign cloud operators can run heterogeneous GPU fleets without choosing a single-vendor operations stack. VibOps manages all of them from the same console, the same agent, the same audit trail.
+    European datacenter operators, national compute programs, and sovereign cloud providers can run heterogeneous GPU fleets — NVIDIA, AMD, and Intel in the same rack — without a vendor-specific operations stack. VibOps manages all of them from the same console, the same agent, the same audit trail.
   </div>
 </div>
 
@@ -843,9 +1042,22 @@
 <div class="section">
   <div class="section-label">Who it's for</div>
   <h2>Built for three segments that own GPU infrastructure</h2>
-  <p>VibOps deploys inside your client's infrastructure — one instance per client, fully under their control. Not a SaaS platform you connect to.</p>
+  <p>VibOps deploys inside your infrastructure — one instance per site, fully under your control. Not a SaaS platform you connect to.</p>
 
   <div class="cards-2col" style="grid-template-columns:repeat(auto-fit,minmax(320px,1fr))">
+    <div class="segment-card">
+      <h3>🏭 GPU Datacenter Operators</h3>
+      <p class="segment-who">HPC centers, national compute programs, colocation providers, sovereign GPU datacenters</p>
+      <p>You own the hardware. VibOps gives you the operations layer to turn raw multi-OEM compute into a managed AI infrastructure service — without building an MLOps platform from scratch.</p>
+      <ul class="value-list">
+        <li>Unified operations across heterogeneous fleets — NVIDIA, AMD, and Intel in the same datacenter</li>
+        <li>Tenant isolation and per-customer FinOps out of the box</li>
+        <li>Offer clients a managed GPU service with full auditability, not just raw access</li>
+        <li>On-prem deployment — no data leaving your facility</li>
+        <li>Air-gap compatible for classified or sovereign environments</li>
+      </ul>
+    </div>
+
     <div class="segment-card">
       <h3>🏢 Cloud Service Providers</h3>
       <p class="segment-who">Outscale, OVH, Scaleway, CoreWeave, regional GPU clouds — any CSP reselling GPU capacity</p>
@@ -858,20 +1070,8 @@
 
       <div class="white-label-box">
         <div class="wl-label">White-label ready</div>
-        <p>Your brand. Your console. Your pricing. VibOps deploys as a backend that powers your existing customer portal — or as a fully white-labeled console under your domain. Configure markup per accelerator type, per customer segment, or per workload. Built-in chargeback reports per customer. RGPD-compliant data isolation between you, your customers, and our engineering team.</p>
+        <p>Your brand. Your console. Your pricing. Configure markup per accelerator type, per customer segment, or per workload. Built-in chargeback reports per customer. Data isolation between you, your customers, and your engineering team.</p>
       </div>
-    </div>
-
-    <div class="segment-card">
-      <h3>🏭 GPU Datacenter Operators</h3>
-      <p class="segment-who">HPC centers, national compute programs, colocation providers evolving toward managed AI services</p>
-      <p>You own the hardware. VibOps gives you the operations layer to turn raw compute into a managed AI infrastructure service — without building an MLOps platform from scratch.</p>
-      <ul class="value-list">
-        <li>Unified operations across heterogeneous accelerator fleets (NVIDIA + AMD + Intel in the same datacenter)</li>
-        <li>Tenant isolation and per-customer FinOps out of the box</li>
-        <li>Offer clients a managed GPU service with full auditability — not just raw access</li>
-        <li>On-prem deployment with no data leaving your facility</li>
-      </ul>
     </div>
 
     <div class="segment-card">
@@ -880,7 +1080,7 @@
       <p>Your MLOps and SRE teams operate GPU clusters without requiring deep Kubernetes expertise at every level. Onboard faster. Operate consistently across on-prem, cloud, and hybrid.</p>
       <ul class="value-list">
         <li>New team members are productive from day one — no six-month onboarding</li>
-        <li>Audit trail for SOC2, internal governance, and data residency requirements</li>
+        <li>Audit trail for SOC 2, internal governance, and data residency requirements</li>
         <li>Consistent operations across on-prem, cloud, and hybrid clusters</li>
         <li>Multi-vendor fleet managed from a single interface — no NVIDIA lock-in required</li>
       </ul>
@@ -900,22 +1100,22 @@
     <div class="step">
       <div class="step-num">01</div>
       <h3>Deploy VibOps</h3>
-      <p>Self-hosted via Helm or Docker Compose. Deploys inside your infrastructure — on-prem, cloud, or hybrid. Your perimeter, your control.</p>
+      <p>Self-hosted via Helm or Docker Compose. Deploys inside your infrastructure — on-prem, colocation, cloud, or hybrid. Your perimeter, your control.</p>
     </div>
     <div class="step">
       <div class="step-num">02</div>
       <h3>Connect your clusters</h3>
-      <p>Install a lightweight Connect Gateway on each cluster. Auto-discovers namespaces, deployments, and GPU resources across any vendor stack.</p>
+      <p>Install a lightweight Connect Gateway on each cluster or site. Auto-discovers namespaces, deployments, and GPU resources across all vendor stacks.</p>
     </div>
     <div class="step">
       <div class="step-num">03</div>
       <h3>Operate in natural language</h3>
-      <p>Use the VibOps console directly, or connect Claude Desktop or Cursor via <code>pip install vibops-mcp</code>. Your AI assistant speaks natively to your stack.</p>
+      <p>Use the VibOps console or connect Claude Desktop via <code>pip install vibops-mcp</code>. Your operators describe what they need — VibOps handles the vendor-specific execution.</p>
     </div>
     <div class="step">
       <div class="step-num">04</div>
       <h3>Full audit trail</h3>
-      <p>Every operation logged with user, timestamp, and exact command executed. Immutable. Compliance-ready from day one.</p>
+      <p>Every operation logged with user, timestamp, vendor, cluster, and exact command executed. Immutable. Compliance-ready from day one.</p>
     </div>
   </div>
 </div>
@@ -926,8 +1126,8 @@
 <div class="section" id="waitlist" style="text-align:center; padding-bottom: 120px;">
   <div class="section-label">Early access</div>
   <h2 style="max-width:100%">Built for teams that take<br>GPU infrastructure seriously</h2>
-  <p style="margin: 16px auto 40px; max-width: 520px;">
-    We're onboarding a limited number of Cloud Service Providers and enterprise teams.
+  <p style="margin: 16px auto 40px; max-width: 560px;">
+    We're onboarding a limited number of GPU datacenter operators, Cloud Service Providers, and large enterprise teams.
     Request access and we'll reach out personally.
   </p>
 
@@ -947,7 +1147,7 @@
     <a href="https://github.com/VibOpsai/vibops-mcp" target="_blank">GitHub (MCP Server)</a>
     <a href="https://github.com/VibOpsai" target="_blank">VibOpsai on GitHub</a>
   </div>
-  © 2026 VibOps — The unified operations platform for multi-vendor GPU infrastructure
+  © 2026 VibOps — The orchestration platform for GPU datacenters
 </footer>
 
 <script>
