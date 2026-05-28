@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>VibOps — AI GPU orchestration for datacenters, CSPs, and enterprises</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%2358a6ff'/><text x='16' y='23' text-anchor='middle' font-size='18' font-family='sans-serif' font-weight='700' fill='white'>V</text></svg>" />
   <meta name="description" content="One platform across every GPU vendor: NVIDIA, AMD, Intel Gaudi, AWS Trainium, Google TPU, Groq. Built for GPU datacenter operators, Cloud Service Providers, and large enterprises. Self-hosted. Audit-ready. Sovereign.">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -765,6 +766,10 @@
 <nav>
   <a href="/" class="logo">Vib<span>Ops</span></a>
   <div class="nav-links">
+    <a href="#features" class="nav-link">⚡ Features</a>
+    <a href="#multivendor" class="nav-link">🌐 Multi-OEM</a>
+    <a href="#security" class="nav-link">🛡 Security</a>
+    <a href="#how-it-works" class="nav-link">🔌 Connect</a>
     <a href="https://github.com/VibOpsai/vibops-mcp" class="nav-link" target="_blank">GitHub</a>
     <a href="#waitlist" class="nav-cta">Request access</a>
   </div>
@@ -857,7 +862,7 @@
 <hr class="divider">
 
 <!-- Problem — the patchwork -->
-<div class="section">
+<div class="section" id="features">
   <div class="section-label">The problem</div>
   <h2>GPU infrastructure runs on a patchwork of vendor-specific tools</h2>
   <p>Every accelerator vendor ships its own CLI, its own dashboard, its own metrics stack. Whether you run a datacenter, a CSP, or an enterprise AI platform, managing a heterogeneous fleet means maintaining parallel workflows — and parallel skill sets.</p>
@@ -940,7 +945,7 @@
 <hr class="divider">
 
 <!-- Safety section -->
-<div class="safety-section">
+<div class="safety-section" id="security">
   <div class="section">
     <div class="section-label">Built for critical infrastructure</div>
     <h2>Why it's safe to run critical workloads on VibOps</h2>
@@ -996,7 +1001,7 @@
 </div>
 
 <!-- Multi-vendor — the real differentiator -->
-<div class="multivendor-section">
+<div class="multivendor-section" id="multivendor">
   <div class="section-label">Multi-OEM by design</div>
   <h2>The only orchestration platform that speaks natively to every accelerator</h2>
   <p style="font-size:18px;color:var(--fg-subtle);max-width:640px;line-height:1.8;margin-bottom:0">
@@ -1091,29 +1096,29 @@
 <hr class="divider">
 
 <!-- How it works -->
-<div class="section">
+<div class="section" id="how-it-works">
   <div class="section-label">How it works</div>
   <h2>Up and running in minutes</h2>
   <p>VibOps deploys as a lightweight control plane next to your existing infrastructure. No agents required on GPU nodes. No data exfiltration.</p>
 
   <div class="steps">
     <div class="step">
-      <div class="step-num">01</div>
+      <div class="step-num">🚀 01</div>
       <h3>Deploy VibOps</h3>
       <p>Self-hosted via Helm or Docker Compose. Deploys inside your infrastructure — on-prem, colocation, cloud, or hybrid. Your perimeter, your control.</p>
     </div>
     <div class="step">
-      <div class="step-num">02</div>
+      <div class="step-num">🔌 02</div>
       <h3>Connect your clusters</h3>
       <p>Install a lightweight Connect Gateway on each cluster or site. Auto-discovers namespaces, deployments, and GPU resources across all vendor stacks.</p>
     </div>
     <div class="step">
-      <div class="step-num">03</div>
+      <div class="step-num">🤖 03</div>
       <h3>Operate in natural language</h3>
       <p>Use the VibOps console or connect Claude Desktop via <code>pip install vibops-mcp</code>. Your operators describe what they need — VibOps handles the vendor-specific execution.</p>
     </div>
     <div class="step">
-      <div class="step-num">04</div>
+      <div class="step-num">📋 04</div>
       <h3>Full audit trail</h3>
       <p>Every operation logged with user, timestamp, vendor, cluster, and exact command executed. Immutable. Compliance-ready from day one.</p>
     </div>
