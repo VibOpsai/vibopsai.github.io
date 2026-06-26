@@ -827,7 +827,8 @@
     🔓 MIT License &nbsp;·&nbsp;
     <a href="https://github.com/VibOpsai/vibops-mcp" target="_blank">vibops-mcp on GitHub ↗</a>
   </div>
-  <div class="oss-item">✅ ~3,843 automated tests</div>
+  <div class="oss-item">🔧 74 MCP tools</div>
+  <div class="oss-item">✅ ~4,800 automated tests</div>
   <div class="oss-item">🔐 pip-audit + Trivy CVE scanning on every commit</div>
   <div class="oss-item">📦 Weekly releases</div>
 </div>
@@ -925,6 +926,11 @@
       <p>Unified cost model with per-vendor pricing, idle GPU detection, budget alerts, and per-tenant chargeback reports — automatically, from the same platform that runs operations.</p>
     </div>
     <div class="card">
+      <div class="card-icon">🎯</div>
+      <h3>Agent Infrastructure Control Plane</h3>
+      <p>Transparent LLM proxy tracks every inference per agent — cost, tokens, latency. Set budgets per agent, enforce model access policies, detect anomalies. Works with any framework: n8n, LangChain, CrewAI, Dify — just change the base URL.</p>
+    </div>
+    <div class="card">
       <div class="card-icon">🏢</div>
       <h3>Multi-tenant by default</h3>
       <p>Full tenant isolation at the row level. One VibOps instance serves multiple customers without data leakage. Per-customer FinOps, quotas, rate limiting, and audit trails out of the box.</p>
@@ -938,6 +944,58 @@
       <div class="card-icon">🔌</div>
       <h3>Connect Gateway</h3>
       <p>Lightweight agent deployed at each site. Supports air-gapped clusters, remote datacenters, and client-managed infrastructure — all visible from one control plane.</p>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- Agent Control Plane -->
+<div class="section">
+  <div class="section-label">Agent Infrastructure Control Plane</div>
+  <h2>The missing layer between your AI agents and your GPU fleet</h2>
+  <p>Your agents are built in n8n, LangChain, CrewAI, or Dify. They call LLMs running on your GPUs. But who controls the cost, the access, and the compliance? VibOps does — transparently, for every framework.</p>
+
+  <div class="cards" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr))">
+    <div class="card">
+      <div class="card-icon">🪪</div>
+      <h3>Identity</h3>
+      <p>Machine identities for every agent — create, rotate, revoke. Full lifecycle tracked in the audit log.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🔑</div>
+      <h3>Model policy</h3>
+      <p>Control which agent can use which LLM model. Glob patterns, deny-first. The pricing agent gets Llama-70B; the FAQ bot gets Mistral-7B.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">💰</div>
+      <h3>Cost per agent</h3>
+      <p>Transparent LLM proxy captures every inference — tokens, GPU time, real cost. Attributed to the agent that made the call.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">📊</div>
+      <h3>Budget enforcement</h3>
+      <p>Set monthly spend caps per agent. Soft alert at 80%, hard block at 100%. No runaway costs.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🔗</div>
+      <h3>Dependency graph</h3>
+      <p>Which agent uses which model, which connector, which sub-agent — with call counts. Impact analysis before any migration.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🚨</div>
+      <h3>Anomaly detection</h3>
+      <p>Cost spikes, request surges, error rate jumps — detected per agent every 10 minutes. Auto-resolve when the condition clears.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">📋</div>
+      <h3>Audit chain</h3>
+      <p>Every inference logged with HMAC-SHA256 chain. Tamper-detectable. Exportable to any SIEM. AI Act and SOC 2 ready.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🔌</div>
+      <h3>Zero integration</h3>
+      <p>Your agents point to the VibOps proxy instead of the LLM directly. No SDK, no code change — just change the base URL.</p>
     </div>
   </div>
 </div>
@@ -992,7 +1050,7 @@
       <div class="safety-item">
         <div class="safety-icon">🧪</div>
         <div>
-          <h4>~3,843 automated tests + CVE scanning</h4>
+          <h4>~4,800 automated tests + CVE scanning</h4>
           <p>Connector tests, behavioral tests, security tests. pip-audit and Trivy scan every dependency on every commit — HIGH and CRITICAL CVEs block the build before they reach production.</p>
         </div>
       </div>
