@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VibOps — AI infrastructure abstraction layer for any application, any hardware</title>
+  <title>VibOps — The control plane between your AI agents and your GPU fleet</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%2358a6ff'/><text x='16' y='23' text-anchor='middle' font-size='18' font-family='sans-serif' font-weight='700' fill='white'>V</text></svg>" />
-  <meta name="description" content="VibOps is the infrastructure abstraction layer that deploys and operates any AI/ML application — regardless of hardware, cloud, or edge site. Self-hosted. Audit-ready. Sovereign.">
+  <meta name="description" content="VibOps is the control plane between your AI agents and your GPU infrastructure. Track GPU cost per agent, enforce budgets and model policies, deploy and scale LLMs — in natural language. Self-hosted. Audit-ready. Sovereign.">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -766,8 +766,8 @@
 <nav>
   <a href="/" class="logo">Vib<span>Ops</span></a>
   <div class="nav-links">
-    <a href="#features" class="nav-link">⚡ Features</a>
-    <a href="#multivendor" class="nav-link">🌐 Multi-OEM</a>
+    <a href="#agent-control" class="nav-link">🎯 Agent Control</a>
+    <a href="#features" class="nav-link">⚡ GPU Ops</a>
     <a href="#security" class="nav-link">🛡 Security</a>
     <a href="#how-it-works" class="nav-link">🔌 Connect</a>
     <a href="https://github.com/VibOpsai/vibops-mcp" class="nav-link" target="_blank">GitHub</a>
@@ -779,13 +779,13 @@
 <section class="hero">
   <div class="badge">
     <span class="badge-dot"></span>
-    AI Infrastructure Abstraction · Multi-OEM · Self-hosted
+    Agent Control Plane · GPU FinOps · Self-hosted
   </div>
 
-  <h1>One platform.<br><em>Any application.</em><br>Any infrastructure.</h1>
+  <h1>The control plane<br>between your <em>AI agents</em><br>and your <em>GPU fleet</em></h1>
 
   <p class="hero-sub">
-    VibOps deploys and operates your AI infrastructure — GPU fleet, LLM models, and the agents that consume them. It tells you exactly what runs where, how much it costs, and who uses what. One conversation replaces kubectl, Helm, and a FinOps spreadsheet — across any hardware, any cloud, any framework.
+    Your agents call LLMs. Your LLMs run on GPUs. VibOps sits in between — tracking which agent costs how much, enforcing budgets and model policies, detecting anomalies, and operating the GPU infrastructure underneath. One conversation replaces kubectl, Helm, and a FinOps spreadsheet.
   </p>
 
   <form class="waitlist-form" id="waitlistForm">
@@ -814,11 +814,11 @@
 
 <!-- Proof bar -->
 <div class="proof-bar">
-  <div class="proof-item">🌐 <span>Any application</span> — any hardware, any site</div>
+  <div class="proof-item">💰 <span>GPU cost per agent</span> — real GPU-hours, not just tokens</div>
+  <div class="proof-item">📊 <span>Budget enforcement</span> — block agents at spend limit</div>
+  <div class="proof-item">🔑 <span>Model policy</span> — which agent uses which LLM</div>
   <div class="proof-item">🔒 <span>Fully self-hosted</span> — your data stays in your infra</div>
-  <div class="proof-item">📋 <span>Immutable audit trail</span> — every action logged</div>
-  <div class="proof-item">🏢 <span>Multi-tenant</span> — datacenter, CSP, enterprise-ready</div>
-  <div class="proof-item">🌍 <span>Air-gap ready</span> — on-prem LLM supported</div>
+  <div class="proof-item">📋 <span>Immutable audit</span> — HMAC-SHA256 on every inference</div>
 </div>
 
 <!-- OSS bar -->
@@ -838,8 +838,8 @@
 <!-- Demo -->
 <div class="demo-section">
   <div class="section-label">See it in action</div>
-  <h2>From conversation to production in minutes</h2>
-  <p>Live cluster inspection, model deployment, pipeline promotion — every step audited across any application and infrastructure.</p>
+  <h2>From question to answer in seconds</h2>
+  <p>"Which agent costs the most?" — VibOps answers with real GPU cost data, per agent, per model, per team.</p>
   <div class="video-wrapper">
     <iframe
       src="https://www.youtube.com/embed/j_nz-VnVPxc"
@@ -853,8 +853,8 @@
 <!-- Console screenshot -->
 <div class="console-section">
   <div class="console-label">The platform</div>
-  <h2>Everything your team needs to operate a GPU workload</h2>
-  <p>Fleet view, agent console, FinOps, multi-tenant isolation, pipelines, and audit — in one place.</p>
+  <h2>GPU cost per agent — visible in one dashboard</h2>
+  <p>Agent FinOps, fleet view, budget alerts, model policies, dependency graph, and audit — in one place.</p>
   <div class="console-img-wrapper">
     <img src="console-screenshot.jpg" alt="VibOps console showing GPU fleet status, agent conversation, and pipeline promotion" loading="lazy">
   </div>
@@ -862,10 +862,65 @@
 
 <hr class="divider">
 
-<!-- Problem — the patchwork -->
+<!-- Agent Control Plane — PRIMARY VALUE PROP -->
+<div class="section" id="agent-control">
+  <div class="section-label">The problem no one else solves</div>
+  <h2>Your agents run on GPUs.<br>Nobody knows which one costs what.</h2>
+  <p style="font-size:18px;color:var(--fg-subtle);max-width:640px;line-height:1.8">
+    You deploy 50 agents calling LLMs on your GPU fleet. The bill arrives: $47,000. GCP Billing sees VMs. LangSmith counts tokens. Neither can tell you which agent consumed how much GPU. VibOps can — because it sits between your agents and your LLMs.
+  </p>
+
+  <div class="cards" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); margin-top: 48px;">
+    <div class="card">
+      <div class="card-icon">💰</div>
+      <h3>Cost per agent</h3>
+      <p>Transparent LLM proxy captures every inference — tokens, GPU time, real cost. Attributed to the agent that made the call. Not tokens — GPU-hours.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">📊</div>
+      <h3>Budget enforcement</h3>
+      <p>Set monthly spend caps per agent. Soft alert at 80%, hard block at 100% (HTTP 429). No runaway costs, no surprises on the bill.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🔑</div>
+      <h3>Model policy</h3>
+      <p>Control which agent can use which LLM. Glob patterns, deny-first. The pricing agent gets Llama-70B; the FAQ bot gets Mistral-7B only (HTTP 403).</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🚨</div>
+      <h3>Anomaly detection</h3>
+      <p>Cost spikes, request surges, error rate jumps — detected per agent every 10 minutes. Auto-resolve when the condition clears.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🔗</div>
+      <h3>Dependency graph</h3>
+      <p>"If I migrate Llama-70B, which agents break?" — impact analysis with call counts and cost exposure before any change.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🪪</div>
+      <h3>Agent identity</h3>
+      <p>Machine identities for every agent — create, rotate, revoke. Full lifecycle tracked in the immutable audit log.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">📋</div>
+      <h3>Audit chain</h3>
+      <p>Every inference logged with HMAC-SHA256 chain. Tamper-detectable. Exportable to any SIEM. AI Act and SOC 2 ready.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🔌</div>
+      <h3>Zero integration</h3>
+      <p>Point your agents to the VibOps proxy — one URL change, one header. No SDK, no code change. Works with n8n, LangChain, CrewAI, Dify, or any OpenAI-compatible client.</p>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- GPU Ops — the foundation underneath -->
 <div class="section" id="features">
-  <div class="section-label">The problem</div>
-  <h2>AI infrastructure runs on a patchwork of incompatible tools</h2>
+<div class="section" id="features">
+  <div class="section-label">The foundation underneath</div>
+  <h2>VibOps also operates the GPU fleet your agents run on</h2>
   <p>Every accelerator vendor ships its own CLI, its own dashboard, its own metrics stack. Every application — custom model, third-party AI platform, Slurm workload — adds another layer. Managing a heterogeneous fleet means maintaining parallel workflows, parallel runbooks, and parallel skill sets.</p>
 
   <div class="patchwork-grid">
@@ -944,58 +999,6 @@
       <div class="card-icon">🔌</div>
       <h3>Connect Gateway</h3>
       <p>Lightweight agent deployed at each site. Supports air-gapped clusters, remote datacenters, and client-managed infrastructure — all visible from one control plane.</p>
-    </div>
-  </div>
-</div>
-
-<hr class="divider">
-
-<!-- Agent Control Plane -->
-<div class="section">
-  <div class="section-label">Agent Infrastructure Control Plane</div>
-  <h2>The missing layer between your AI agents and your GPU fleet</h2>
-  <p>Your agents are built in n8n, LangChain, CrewAI, or Dify. They call LLMs running on your GPUs. But who controls the cost, the access, and the compliance? VibOps does — transparently, for every framework.</p>
-
-  <div class="cards" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr))">
-    <div class="card">
-      <div class="card-icon">🪪</div>
-      <h3>Identity</h3>
-      <p>Machine identities for every agent — create, rotate, revoke. Full lifecycle tracked in the audit log.</p>
-    </div>
-    <div class="card">
-      <div class="card-icon">🔑</div>
-      <h3>Model policy</h3>
-      <p>Control which agent can use which LLM model. Glob patterns, deny-first. The pricing agent gets Llama-70B; the FAQ bot gets Mistral-7B.</p>
-    </div>
-    <div class="card">
-      <div class="card-icon">💰</div>
-      <h3>Cost per agent</h3>
-      <p>Transparent LLM proxy captures every inference — tokens, GPU time, real cost. Attributed to the agent that made the call.</p>
-    </div>
-    <div class="card">
-      <div class="card-icon">📊</div>
-      <h3>Budget enforcement</h3>
-      <p>Set monthly spend caps per agent. Soft alert at 80%, hard block at 100%. No runaway costs.</p>
-    </div>
-    <div class="card">
-      <div class="card-icon">🔗</div>
-      <h3>Dependency graph</h3>
-      <p>Which agent uses which model, which connector, which sub-agent — with call counts. Impact analysis before any migration.</p>
-    </div>
-    <div class="card">
-      <div class="card-icon">🚨</div>
-      <h3>Anomaly detection</h3>
-      <p>Cost spikes, request surges, error rate jumps — detected per agent every 10 minutes. Auto-resolve when the condition clears.</p>
-    </div>
-    <div class="card">
-      <div class="card-icon">📋</div>
-      <h3>Audit chain</h3>
-      <p>Every inference logged with HMAC-SHA256 chain. Tamper-detectable. Exportable to any SIEM. AI Act and SOC 2 ready.</p>
-    </div>
-    <div class="card">
-      <div class="card-icon">🔌</div>
-      <h3>Zero integration</h3>
-      <p>Your agents point to the VibOps proxy instead of the LLM directly. No SDK, no code change — just change the base URL.</p>
     </div>
   </div>
 </div>
