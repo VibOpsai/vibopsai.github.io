@@ -750,13 +750,27 @@
     footer a { color: var(--fg-subtle); text-decoration: none; }
     footer a:hover { color: var(--fg); }
 
-    @media (max-width: 600px) {
+    @media (max-width: 768px) {
       nav { padding: 14px 20px; }
-      .nav-links { gap: 16px; }
+      .nav-links .nav-link { display: none; }
+      .nav-links { gap: 12px; }
+      .hero { padding: 80px 20px 32px; min-height: auto; }
+      h1 { font-size: 32px; letter-spacing: -1px; }
+      .hero-sub { font-size: 15px; }
+      .badge { font-size: 11px; }
+      .vendor-pill-row { display: none; }
+      .vendor-pill-sep { display: none; }
       .waitlist-form { flex-direction: column; }
-      .proof-bar { gap: 24px; padding: 18px 24px; }
-      .oss-bar { gap: 20px; padding: 16px 24px; }
+      .proof-bar { gap: 16px; padding: 16px 20px; flex-direction: column; text-align: center; }
+      .oss-bar { gap: 12px; padding: 14px 20px; flex-direction: column; text-align: center; }
+      .cards { grid-template-columns: 1fr; }
       .cards-2col { grid-template-columns: 1fr; }
+      .patchwork-grid { grid-template-columns: 1fr; }
+      .vendor-grid { grid-template-columns: repeat(2, 1fr); }
+      .safety-grid { grid-template-columns: 1fr; }
+      .steps { grid-template-columns: 1fr; }
+      .section { padding: 60px 20px; }
+      .section h2 { font-size: 24px; }
     }
   </style>
 </head>
