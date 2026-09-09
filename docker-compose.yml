@@ -207,8 +207,7 @@ services:
       - caddy_config:/config
     environment:
       VIBOPS_DOMAIN: ${VIBOPS_DOMAIN:-:80}
-    entrypoint: sh
-    command: -c "printf '$$VIBOPS_DOMAIN {\n  reverse_proxy console:8003\n  handle_path /api/* {\n    reverse_proxy core:8000\n  }\n}\n' > /etc/caddy/Caddyfile && caddy run --config /etc/caddy/Caddyfile --adapter caddyfile"
+    entrypoint: ["sh", "-c", "printf '%s {\n  reverse_proxy console:8003\n}\n' \"$VIBOPS_DOMAIN\" > /etc/caddy/Caddyfile && caddy run --config /etc/caddy/Caddyfile --adapter caddyfile"]
     depends_on:
       - console
       - core

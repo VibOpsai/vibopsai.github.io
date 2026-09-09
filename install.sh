@@ -167,6 +167,9 @@ SMTP_USER=
 SMTP_PASSWORD=
 SMTP_FROM=noreply@yourcompany.com
 
+# ─── Reverse proxy ──────────────────────────────────────────
+VIBOPS_DOMAIN=:80
+
 # ─── Internal URLs ──────────────────────────────────────────
 CORE_API_URL=http://core:8000
 AGENT_API_URL=http://agent:8001
