@@ -8,7 +8,7 @@ set -euo pipefail
 # Requires: root or sudo, internet access, 4GB+ RAM, 20GB+ disk.
 #
 # Usage:
-#   curl -fsSL https://raw.githubusercontent.com/davidmacamara-boop/vibops/main/install/install.sh | bash
+#   curl -fsSL https://vibops.ai/install.sh | bash
 #
 # Or with options:
 #   bash install.sh --version 0.41.0 --llm-key sk-ant-xxx --admin-email admin@company.com
@@ -21,7 +21,7 @@ LLM_MODEL="${LLM_MODEL:-claude-sonnet-4-6}"
 LLM_PROVIDER="${LLM_PROVIDER:-claude}"
 ADMIN_EMAIL="${ADMIN_EMAIL:-admin@vibops.local}"
 ADMIN_PASSWORD="${ADMIN_PASSWORD:-}"
-COMPOSE_URL="https://raw.githubusercontent.com/davidmacamara-boop/vibops/main/install/docker-compose.yml"
+COMPOSE_URL="https://vibops.ai/docker-compose.yml"
 
 # ── Parse args ───────────────────────────────────────────────────────────────
 
