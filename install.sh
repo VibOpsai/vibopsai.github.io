@@ -15,7 +15,7 @@ set -euo pipefail
 # ─────────────────────────────────────────────────────────────────────────────
 
 VIBOPS_DIR="/opt/vibops"
-VIBOPS_VERSION="${VIBOPS_VERSION:-0.41.2}"
+VIBOPS_VERSION="${VIBOPS_VERSION:-v0.41.2}"
 LLM_API_KEY="${LLM_API_KEY:-}"
 LLM_MODEL="${LLM_MODEL:-claude-sonnet-4-6}"
 LLM_PROVIDER="${LLM_PROVIDER:-claude}"
