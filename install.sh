@@ -92,6 +92,17 @@ else
   warn "docker-compose.yml already exists — keeping existing file"
 fi
 
+# ── 4b. Generate Caddyfile ────────────────────────────────────────────────────
+
+if [[ ! -f Caddyfile ]]; then
+  cat > Caddyfile <<'CADDYEOF'
+:80 {
+  reverse_proxy console:8003
+}
+CADDYEOF
+  info "Generated Caddyfile (port 80 — use Cloudflare or edit for HTTPS)"
+fi
+
 # ── 5. Generate .env ─────────────────────────────────────────────────────────
 
 if [[ ! -f .env ]]; then

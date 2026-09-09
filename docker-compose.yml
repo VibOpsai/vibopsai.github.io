@@ -205,9 +205,7 @@ services:
     volumes:
       - caddy_data:/data
       - caddy_config:/config
-    environment:
-      VIBOPS_DOMAIN: ${VIBOPS_DOMAIN:-:80}
-    entrypoint: ["sh", "-c", "printf '%s {\n  reverse_proxy console:8003\n}\n' \"$VIBOPS_DOMAIN\" > /etc/caddy/Caddyfile && caddy run --config /etc/caddy/Caddyfile --adapter caddyfile"]
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
     depends_on:
       - console
       - core
