@@ -142,6 +142,10 @@ LLM_BASE_URL=
 # ─── App ────────────────────────────────────────────────────
 APP_ENV=production
 
+# ─── Webhooks (generated, override if needed) ───────────
+GITHUB_WEBHOOK_SECRET=$(openssl rand -hex 32)
+GRAFANA_WEBHOOK_SECRET=$(openssl rand -hex 32)
+
 # ─── Grafana ────────────────────────────────────────────────
 GRAFANA_PUBLIC_URL=http://localhost:3000
 GRAFANA_PASSWORD=${GRAFANA_PASSWORD}
