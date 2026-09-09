@@ -50,8 +50,6 @@ services:
     environment:
       DATABASE_URL: postgresql+asyncpg://vibops:${POSTGRES_PASSWORD}@postgres:5432/vibops_db
       REDIS_URL: redis://:${REDIS_PASSWORD:-vibops-dev}@redis:6379/0
-    ports:
-      - "0.0.0.0:8000:8000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -172,8 +170,6 @@ services:
     environment:
       CORE_API_URL: http://core:8000
       AGENT_API_URL: http://agent:8001
-    ports:
-      - "0.0.0.0:8003:8003"
     depends_on:
       core:
         condition: service_healthy
@@ -191,11 +187,31 @@ services:
     environment:
       CORE_API_URL: http://core:8000
       INTERNAL_API_KEY: ${INTERNAL_API_KEY:-}
-    ports:
-      - "127.0.0.1:8004:8004"
     depends_on:
       core:
         condition: service_healthy
+    networks:
+      - vibops_net
+
+  # ─── Reverse Proxy ───────────────────────────────────────────────────────
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: vibops_caddy
+    restart: unless-stopped
+    ports:
+      - "0.0.0.0:80:80"
+      - "0.0.0.0:443:443"
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+    environment:
+      VIBOPS_DOMAIN: ${VIBOPS_DOMAIN:-:80}
+    entrypoint: sh
+    command: -c "printf '$$VIBOPS_DOMAIN {\n  reverse_proxy console:8003\n  handle_path /api/* {\n    reverse_proxy core:8000\n  }\n}\n' > /etc/caddy/Caddyfile && caddy run --config /etc/caddy/Caddyfile --adapter caddyfile"
+    depends_on:
+      - console
+      - core
     networks:
       - vibops_net
 
@@ -233,6 +249,8 @@ volumes:
   backups:
   prometheus_data:
   grafana_data:
+  caddy_data:
+  caddy_config:
 
 networks:
   vibops_net:
