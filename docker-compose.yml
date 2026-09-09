@@ -42,7 +42,7 @@ services:
   # ─── Core API ─────────────────────────────────────────────────────────────
 
   core:
-    image: ghcr.io/davidmacamara-boop/vibops-core:${VIBOPS_VERSION:-0.41.0}
+    image: ghcr.io/davidmacamara-boop/vibops-core:${VIBOPS_VERSION:-0.41.1}
     container_name: vibops_core
     restart: unless-stopped
     command: ["api"]
@@ -83,7 +83,7 @@ services:
   # ─── Worker + Beat ────────────────────────────────────────────────────────
 
   worker:
-    image: ghcr.io/davidmacamara-boop/vibops-worker:${VIBOPS_VERSION:-0.41.0}
+    image: ghcr.io/davidmacamara-boop/vibops-worker:${VIBOPS_VERSION:-0.41.1}
     container_name: vibops_worker
     restart: unless-stopped
     command: ["worker"]
@@ -101,7 +101,7 @@ services:
       - vibops_net
 
   beat:
-    image: ghcr.io/davidmacamara-boop/vibops-core:${VIBOPS_VERSION:-0.41.0}
+    image: ghcr.io/davidmacamara-boop/vibops-core:${VIBOPS_VERSION:-0.41.1}
     container_name: vibops_beat
     restart: unless-stopped
     command: ["beat"]
@@ -144,7 +144,7 @@ services:
   # ─── Agent ────────────────────────────────────────────────────────────────
 
   agent:
-    image: ghcr.io/davidmacamara-boop/vibops-agent:${VIBOPS_VERSION:-0.41.0}
+    image: ghcr.io/davidmacamara-boop/vibops-agent:${VIBOPS_VERSION:-0.41.1}
     container_name: vibops_agent
     restart: unless-stopped
     env_file: .env
@@ -165,7 +165,7 @@ services:
   # ─── Console ──────────────────────────────────────────────────────────────
 
   console:
-    image: ghcr.io/davidmacamara-boop/vibops-console:${VIBOPS_VERSION:-0.41.0}
+    image: ghcr.io/davidmacamara-boop/vibops-console:${VIBOPS_VERSION:-0.41.1}
     container_name: vibops_console
     restart: unless-stopped
     env_file: .env
@@ -185,7 +185,7 @@ services:
   # ─── LLM Proxy ───────────────────────────────────────────────────────────
 
   llm-proxy:
-    image: ghcr.io/davidmacamara-boop/vibops-llm-proxy:${VIBOPS_VERSION:-0.41.0}
+    image: ghcr.io/davidmacamara-boop/vibops-llm-proxy:${VIBOPS_VERSION:-0.41.1}
     container_name: vibops_llm_proxy
     restart: unless-stopped
     environment:
