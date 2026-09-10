@@ -170,6 +170,8 @@ services:
     environment:
       CORE_API_URL: http://core:8000
       AGENT_API_URL: http://agent:8001
+    volumes:
+      - console_data:/data
     depends_on:
       core:
         condition: service_healthy
@@ -251,6 +253,7 @@ volumes:
   grafana_data:
   caddy_data:
   caddy_config:
+  console_data:
 
 networks:
   vibops_net:
