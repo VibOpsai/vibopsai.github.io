@@ -202,10 +202,13 @@ services:
     ports:
       - "0.0.0.0:80:80"
       - "0.0.0.0:443:443"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     volumes:
       - caddy_data:/data
       - caddy_config:/config
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./static:/static:ro
     depends_on:
       - console
       - core

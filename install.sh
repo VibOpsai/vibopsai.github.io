@@ -97,10 +97,27 @@ fi
 if [[ ! -f Caddyfile ]]; then
   cat > Caddyfile <<'CADDYEOF'
 :80 {
+  handle /whisper {
+    root * /static
+    rewrite * /whisper.html
+    file_server
+  }
+  handle /whisper-api/* {
+    uri strip_prefix /whisper-api
+    reverse_proxy host.docker.internal:30181
+  }
   reverse_proxy console:8003
 }
 CADDYEOF
   info "Generated Caddyfile (port 80 — use Cloudflare or edit for HTTPS)"
+fi
+
+# ── 4c. Static files ─────────────────────────────────────────────────────────
+
+mkdir -p static
+if [[ ! -f static/whisper.html ]]; then
+  curl -fsSL "https://vibops.ai/static/whisper.html" -o static/whisper.html 2>/dev/null \
+    || info "Whisper test page not available — skipped"
 fi
 
 # ── 5. Generate .env ─────────────────────────────────────────────────────────

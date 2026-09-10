@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Whisper ASR — Test</title>
+<style>
+:root { --bg: #0f0f0f; --card: #1a1a1a; --accent: #16a34a; --text: #e5e5e5; --muted: #888; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+.container { max-width: 540px; width: 100%; padding: 20px; }
+h1 { font-size: 22px; font-weight: 600; margin-bottom: 4px; }
+.sub { color: var(--muted); font-size: 13px; margin-bottom: 24px; }
+.card { background: var(--card); border-radius: 12px; padding: 24px; margin-bottom: 16px; }
+
+/* Record button */
+.record-btn {
+  width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--accent);
+  background: transparent; cursor: pointer; display: flex; align-items: center;
+  justify-content: center; margin: 0 auto 16px; transition: all 0.2s;
+}
+.record-btn:hover { background: rgba(22,163,74,0.1); }
+.record-btn.recording { border-color: #ef4444; background: rgba(239,68,68,0.15); animation: pulse 1.5s infinite; }
+.record-btn svg { width: 32px; height: 32px; }
+@keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+
+.status { text-align: center; font-size: 13px; color: var(--muted); margin-bottom: 16px; min-height: 20px; }
+
+/* Upload */
+.upload-area {
+  border: 2px dashed #333; border-radius: 8px; padding: 20px; text-align: center;
+  cursor: pointer; transition: border-color 0.2s; margin-bottom: 16px;
+}
+.upload-area:hover { border-color: var(--accent); }
+.upload-area input { display: none; }
+.upload-area p { color: var(--muted); font-size: 13px; }
+
+/* Result */
+.result { background: #111; border-radius: 8px; padding: 16px; min-height: 60px; font-size: 15px; line-height: 1.6; white-space: pre-wrap; display: none; }
+.result.show { display: block; }
+.result .label { font-size: 11px; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+.result .text { color: #fff; }
+.result .meta { color: var(--muted); font-size: 12px; margin-top: 12px; }
+
+/* Config */
+.config { display: flex; gap: 8px; margin-bottom: 16px; }
+.config input { flex: 1; background: #111; border: 1px solid #333; border-radius: 6px; padding: 8px 12px; color: var(--text); font-size: 13px; }
+.config select { background: #111; border: 1px solid #333; border-radius: 6px; padding: 8px 12px; color: var(--text); font-size: 13px; }
+
+.spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid #333; border-top-color: var(--accent); border-radius: 50%; animation: spin 0.6s linear infinite; vertical-align: middle; margin-right: 6px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Whisper ASR</h1>
+  <p class="sub">Speech-to-text powered by VibOps on K3s</p>
+
+  <div class="card">
+    <div class="config">
+      <input type="text" id="endpoint" value="/whisper-api" placeholder="Whisper endpoint">
+      <select id="lang">
+        <option value="">Auto-detect</option>
+        <option value="en">English</option>
+        <option value="fr">French</option>
+        <option value="de">German</option>
+        <option value="es">Spanish</option>
+        <option value="ar">Arabic</option>
+        <option value="zh">Chinese</option>
+        <option value="ja">Japanese</option>
+      </select>
+    </div>
+
+    <button class="record-btn" id="recordBtn" onclick="toggleRecord()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path id="micIcon" d="M12 1a4 4 0 0 0-4 4v7a4 4 0 0 0 8 0V5a4 4 0 0 0-4-4z" fill="currentColor" stroke="none"/>
+        <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+        <line x1="12" y1="19" x2="12" y2="23"/>
+        <line x1="8" y1="23" x2="16" y2="23"/>
+      </svg>
+    </button>
+    <div class="status" id="status">Click the mic to record, or drop an audio file below</div>
+
+    <div class="upload-area" id="dropArea" onclick="document.getElementById('fileInput').click()">
+      <input type="file" id="fileInput" accept="audio/*,.mp3,.wav,.m4a,.ogg,.flac,.webm" onchange="handleFile(this.files[0])">
+      <p>Drop audio file here or click to browse</p>
+    </div>
+  </div>
+
+  <div class="result" id="result">
+    <div class="label">Transcription</div>
+    <div class="text" id="transcription"></div>
+    <div class="meta" id="meta"></div>
+  </div>
+</div>
+
+<script>
+let mediaRecorder = null;
+let audioChunks = [];
+let recording = false;
+let startTime = 0;
+
+const btn = document.getElementById('recordBtn');
+const status = document.getElementById('status');
+const dropArea = document.getElementById('dropArea');
+
+// Drag & drop
+dropArea.addEventListener('dragover', e => { e.preventDefault(); dropArea.style.borderColor = '#16a34a'; });
+dropArea.addEventListener('dragleave', () => { dropArea.style.borderColor = '#333'; });
+dropArea.addEventListener('drop', e => { e.preventDefault(); dropArea.style.borderColor = '#333'; if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); });
+
+function toggleRecord() {
+  if (recording) stopRecord();
+  else startRecord();
+}
+
+async function startRecord() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    mediaRecorder = new MediaRecorder(stream);
+    audioChunks = [];
+    mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+    mediaRecorder.onstop = () => {
+      stream.getTracks().forEach(t => t.stop());
+      const blob = new Blob(audioChunks, { type: 'audio/webm' });
+      transcribe(blob, 'recording.webm');
+    };
+    mediaRecorder.start();
+    recording = true;
+    startTime = Date.now();
+    btn.classList.add('recording');
+    status.textContent = 'Recording... click again to stop';
+  } catch (e) {
+    status.textContent = 'Microphone access denied';
+  }
+}
+
+function stopRecord() {
+  if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+    mediaRecorder.stop();
+  }
+  recording = false;
+  btn.classList.remove('recording');
+  status.innerHTML = '<span class="spinner"></span>Transcribing...';
+}
+
+function handleFile(file) {
+  if (!file) return;
+  status.innerHTML = '<span class="spinner"></span>Transcribing ' + file.name + '...';
+  transcribe(file, file.name);
+}
+
+async function transcribe(blob, filename) {
+  const endpoint = document.getElementById('endpoint').value.replace(/\/+$/, '');
+  const lang = document.getElementById('lang').value;
+  const t0 = Date.now();
+
+  const formData = new FormData();
+  formData.append('audio_file', blob, filename);
+
+  let url = endpoint + '/asr?output=json';
+  if (lang) url += '&language=' + lang;
+
+  try {
+    const r = await fetch(url, { method: 'POST', body: formData });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const data = await r.json();
+    const elapsed = ((Date.now() - t0) / 1000).toFixed(1);
+
+    const text = data.text || data.transcription || JSON.stringify(data);
+    const detected = data.language || lang || 'auto';
+
+    document.getElementById('transcription').textContent = text;
+    document.getElementById('meta').textContent = 'Language: ' + detected + ' · Time: ' + elapsed + 's · Endpoint: ' + endpoint;
+    document.getElementById('result').classList.add('show');
+    status.textContent = 'Done — ' + elapsed + 's';
+  } catch (e) {
+    status.textContent = 'Error: ' + e.message;
+    document.getElementById('result').classList.remove('show');
+  }
+}
+</script>
+</body>
+</html>
