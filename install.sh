@@ -12,15 +12,23 @@ set -euo pipefail
 #
 # Or with options:
 #   bash install.sh --version 0.41.0 --llm-key sk-ant-xxx --admin-email admin@company.com
+#
+# HTTPS automatique (recommande en production) :
+#   bash install.sh --domain vibops.exemple.com
+#   Caddy obtient alors un certificat Let's Encrypt et redirige HTTP vers HTTPS.
+#   Sans --domain, l'installation reste en HTTP simple sur le port 80.
 # ─────────────────────────────────────────────────────────────────────────────
 
 VIBOPS_DIR="/opt/vibops"
-VIBOPS_VERSION="${VIBOPS_VERSION:-v0.41.5}"
+VIBOPS_VERSION="${VIBOPS_VERSION:-v0.42.0}"
 LLM_API_KEY="${LLM_API_KEY:-}"
-LLM_MODEL="${LLM_MODEL:-claude-sonnet-4-6}"
+LLM_MODEL="${LLM_MODEL:-claude-sonnet-5}"
 LLM_PROVIDER="${LLM_PROVIDER:-claude}"
 ADMIN_EMAIL="${ADMIN_EMAIL:-admin@vibops.local}"
 ADMIN_PASSWORD="${ADMIN_PASSWORD:-}"
+# Nom de domaine du reverse proxy. Vide → Caddy ecoute en HTTP simple sur :80.
+# Renseigne → Caddy obtient un certificat Let's Encrypt et redirige HTTP vers HTTPS.
+VIBOPS_DOMAIN="${VIBOPS_DOMAIN:-}"
 COMPOSE_URL="https://vibops.ai/docker-compose.yml"
 
 # ── Parse args ───────────────────────────────────────────────────────────────
@@ -33,6 +41,7 @@ while [[ $# -gt 0 ]]; do
     --llm-provider) LLM_PROVIDER="$2"; shift 2 ;;
     --admin-email)  ADMIN_EMAIL="$2"; shift 2 ;;
     --admin-password) ADMIN_PASSWORD="$2"; shift 2 ;;
+    --domain)       VIBOPS_DOMAIN="$2"; shift 2 ;;
     --dir)          VIBOPS_DIR="$2"; shift 2 ;;
     *) echo "Unknown option: $1"; exit 1 ;;
   esac
@@ -95,8 +104,25 @@ fi
 # ── 4b. Generate Caddyfile ────────────────────────────────────────────────────
 
 if [[ ! -f Caddyfile ]]; then
-  cat > Caddyfile <<'CADDYEOF'
-:80 {
+  # Sans domaine, Caddy ne peut obtenir aucun certificat : Let's Encrypt ne
+  # certifie pas les adresses IP. On le demande donc, quitte a retomber sur :80.
+  if [[ -z "$VIBOPS_DOMAIN" || "$VIBOPS_DOMAIN" == ":80" ]] && [[ -t 0 ]]; then
+    echo
+    echo "  Domaine pointant vers cette machine (ex. vibops.exemple.com)."
+    echo "  Laisser vide pour rester en HTTP simple sur le port 80."
+    read -r -p "  Domaine [aucun] : " _d || true
+    VIBOPS_DOMAIN="${_d:-}"
+  fi
+
+  if [[ -n "$VIBOPS_DOMAIN" && "$VIBOPS_DOMAIN" != ":80" ]]; then
+    SITE_ADDRESS="$VIBOPS_DOMAIN"
+  else
+    SITE_ADDRESS=":80"
+    VIBOPS_DOMAIN=":80"
+  fi
+
+  cat > Caddyfile <<CADDYEOF
+${SITE_ADDRESS} {
   handle /whisper {
     root * /static
     rewrite * /whisper.html
@@ -109,7 +135,20 @@ if [[ ! -f Caddyfile ]]; then
   reverse_proxy console:8003
 }
 CADDYEOF
-  info "Generated Caddyfile (port 80 — use Cloudflare or edit for HTTPS)"
+
+  if [[ "$SITE_ADDRESS" == ":80" ]]; then
+    warn "Caddyfile genere sans domaine — HTTP SIMPLE, AUCUN CHIFFREMENT."
+    warn "  Mots de passe et jetons de session circuleront en clair."
+    warn "  Acceptable uniquement derriere un proxy TLS (Cloudflare) ou sur reseau prive."
+    warn "  Pour activer HTTPS : relancer avec --domain votre-domaine.com,"
+    warn "  ou remplacer ':80' par le domaine dans ${VIBOPS_DIR}/Caddyfile puis"
+    warn "  redemarrer Caddy (docker compose restart caddy)."
+  else
+    info "Caddyfile genere pour ${SITE_ADDRESS} — Caddy obtiendra un certificat"
+    info "  Let's Encrypt au demarrage et redirigera HTTP vers HTTPS."
+    info "  Prerequis : l'enregistrement DNS de ${SITE_ADDRESS} doit pointer vers"
+    info "  cette machine, et les ports 80 et 443 doivent etre joignables."
+  fi
 fi
 
 # ── 4c. Static files ─────────────────────────────────────────────────────────
@@ -196,7 +235,7 @@ SMTP_PASSWORD=
 SMTP_FROM=noreply@yourcompany.com
 
 # ─── Reverse proxy ──────────────────────────────────────────
-VIBOPS_DOMAIN=:80
+VIBOPS_DOMAIN=${VIBOPS_DOMAIN:-:80}
 
 # ─── Internal URLs ──────────────────────────────────────────
 CORE_API_URL=http://core:8000
