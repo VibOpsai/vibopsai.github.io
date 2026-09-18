@@ -20,7 +20,7 @@ set -euo pipefail
 # ─────────────────────────────────────────────────────────────────────────────
 
 VIBOPS_DIR="/opt/vibops"
-VIBOPS_VERSION="${VIBOPS_VERSION:-v0.43.0}"
+VIBOPS_VERSION="${VIBOPS_VERSION:-v0.44.0}"
 LLM_API_KEY="${LLM_API_KEY:-}"
 LLM_MODEL="${LLM_MODEL:-claude-sonnet-5}"
 LLM_PROVIDER="${LLM_PROVIDER:-claude}"
@@ -257,7 +257,15 @@ info "All images pulled"
 # ── 7. Start services ───────────────────────────────────────────────────────
 
 info "Starting VibOps..."
-docker compose up -d
+# --wait : rendre la main quand les services repondent, pas quand leurs
+# processus existent. Sans lui, l'installateur affichait « Console:
+# http://IP:8003 » alors que la console pouvait encore repondre par une reponse
+# vide — le port est ouvert avant qu'uvicorn serve.
+#
+# `|| true` parce que le script tourne sous `set -e` : un depassement de delai
+# doit laisser la boucle ci-dessous diagnostiquer et afficher un message utile,
+# pas interrompre l'installation sur un code de retour nu.
+docker compose up -d --wait --wait-timeout 300 || true
 
 # ── 8. Wait for healthy ─────────────────────────────────────────────────────
 

@@ -42,7 +42,7 @@ services:
   # ─── Core API ─────────────────────────────────────────────────────────────
 
   core:
-    image: ghcr.io/davidmacamara-boop/vibops-core:${VIBOPS_VERSION:-v0.43.0}
+    image: ghcr.io/davidmacamara-boop/vibops-core:${VIBOPS_VERSION:-v0.44.0}
     container_name: vibops_core
     restart: unless-stopped
     command: ["api"]
@@ -75,13 +75,22 @@ services:
       BUILD: 1
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
+    healthcheck:
+      # Le proxy repond a /_ping, autorise par defaut. Sans lui, `worker`
+      # demarrait parfois avant que haproxy accepte les connexions et son
+      # premier docker_build echouait sur un refus de connexion.
+      test: ["CMD-SHELL", "wget -q -O/dev/null http://127.0.0.1:2375/_ping || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
     networks:
       - vibops_net
 
   # ─── Worker + Beat ────────────────────────────────────────────────────────
 
   worker:
-    image: ghcr.io/davidmacamara-boop/vibops-worker:${VIBOPS_VERSION:-v0.43.0}
+    image: ghcr.io/davidmacamara-boop/vibops-worker:${VIBOPS_VERSION:-v0.44.0}
     container_name: vibops_worker
     restart: unless-stopped
     command: ["worker"]
@@ -95,11 +104,25 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+    healthcheck:
+      # « Pret » pour un worker Celery, c'est repondre au broker — pas avoir un
+      # processus. `inspect ping` fait l'aller-retour complet par Redis, donc il
+      # echoue aussi quand le broker est injoignable, ce qui est exactement
+      # l'etat ou le worker ne sert a rien.
+      #
+      # Le module est `app.workers.celery_app`. `app.celery_app` n'existe pas —
+      # c'est le chemin que portait tests/e2e/test_00_install.py, ou il faisait
+      # sauter le test a chaque execution.
+      test: ["CMD-SHELL", "celery -A app.workers.celery_app inspect ping --timeout 5 >/dev/null 2>&1 || exit 1"]
+      interval: 30s
+      timeout: 15s
+      retries: 3
+      start_period: 40s
     networks:
       - vibops_net
 
   beat:
-    image: ghcr.io/davidmacamara-boop/vibops-core:${VIBOPS_VERSION:-v0.43.0}
+    image: ghcr.io/davidmacamara-boop/vibops-core:${VIBOPS_VERSION:-v0.44.0}
     container_name: vibops_beat
     restart: unless-stopped
     command: ["beat"]
@@ -110,6 +133,20 @@ services:
     depends_on:
       - redis
       - worker
+    healthcheck:
+      # beat n'a ni port ni `inspect`. Ce qui se verifie est qu'il *bat* :
+      # le planificateur persistant reecrit son fichier toutes les trois
+      # minutes environ (mesure : 13:29:02 puis 13:32). Dix minutes laissent la
+      # marge, et distinguent un beat fige d'un beat vivant — ce qu'un simple
+      # « le processus existe » ne fait pas.
+      #
+      # `| grep -q .` parce que `find` rend 0 meme sans resultat : sans lui la
+      # sonde reussirait sur un fichier vieux d'un mois.
+      test: ["CMD-SHELL", "find /app/celerybeat-schedule -mmin -10 | grep -q . || exit 1"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
     networks:
       - vibops_net
 
@@ -136,13 +173,24 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    healthcheck:
+      # « Pret » pour une boucle de sauvegarde, c'est avoir produit une
+      # sauvegarde. Le conteneur dort 24 h entre deux dumps : deux jours de
+      # tolerance couvrent un redemarrage sans masquer une boucle cassee — un
+      # mot de passe errone laisse le processus vivant et /backups vide, etat
+      # que « Up » ne distingue pas d'un fonctionnement normal.
+      test: ["CMD-SHELL", "find /backups -name 'vibops_*.sql.gz' -mtime -2 | grep -q . || exit 1"]
+      interval: 5m
+      timeout: 10s
+      retries: 3
+      start_period: 120s
     networks:
       - vibops_net
 
   # ─── Agent ────────────────────────────────────────────────────────────────
 
   agent:
-    image: ghcr.io/davidmacamara-boop/vibops-agent:${VIBOPS_VERSION:-v0.43.0}
+    image: ghcr.io/davidmacamara-boop/vibops-agent:${VIBOPS_VERSION:-v0.44.0}
     container_name: vibops_agent
     restart: unless-stopped
     env_file: .env
@@ -157,13 +205,22 @@ services:
     depends_on:
       core:
         condition: service_healthy
+    healthcheck:
+      # `/` rend 46 octets d'identification du service — deja present, rien a
+      # ajouter cote application. start_period genereux : l'agent charge son
+      # catalogue d'outils dynamique au demarrage.
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8001/')\" 2>/dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     networks:
       - vibops_net
 
   # ─── Console ──────────────────────────────────────────────────────────────
 
   console:
-    image: ghcr.io/davidmacamara-boop/vibops-console:${VIBOPS_VERSION:-v0.43.0}
+    image: ghcr.io/davidmacamara-boop/vibops-console:${VIBOPS_VERSION:-v0.44.0}
     container_name: vibops_console
     restart: unless-stopped
     env_file: .env
@@ -172,6 +229,17 @@ services:
       AGENT_API_URL: http://agent:8001
     volumes:
       - console_data:/data
+    # Sans lui, console est « Up » des que le processus existe, avant
+    # qu'uvicorn serve : `docker compose up -d` rend la main sur une console
+    # qui repond par une reponse vide. `/api/health` existe deja et est
+    # publique ; il manquait seulement que le compose la sonde. urllib plutot
+    # que curl, absent de l'image.
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8003/api/health')\" 2>/dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
     depends_on:
       core:
         condition: service_healthy
@@ -183,7 +251,7 @@ services:
   # ─── LLM Proxy ───────────────────────────────────────────────────────────
 
   llm-proxy:
-    image: ghcr.io/davidmacamara-boop/vibops-llm-proxy:${VIBOPS_VERSION:-v0.43.0}
+    image: ghcr.io/davidmacamara-boop/vibops-llm-proxy:${VIBOPS_VERSION:-v0.44.0}
     container_name: vibops_llm_proxy
     restart: unless-stopped
     environment:
@@ -192,6 +260,12 @@ services:
     depends_on:
       core:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8004/health')\" 2>/dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
     networks:
       - vibops_net
 
@@ -214,6 +288,15 @@ services:
     depends_on:
       - console
       - core
+    healthcheck:
+      # L'API d'admin, sur 127.0.0.1 et non `localhost` : elle n'ecoute qu'en
+      # IPv4, et `localhost` resout d'abord en ::1 dans cette image — wget y
+      # recoit un refus de connexion. Verifie sur caddy:2-alpine.
+      test: ["CMD-SHELL", "wget -q -O/dev/null --timeout=5 http://127.0.0.1:2019/config/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
     networks:
       - vibops_net
 
@@ -227,6 +310,12 @@ services:
       - prometheus_data:/prometheus
     ports:
       - "127.0.0.1:9090:9090"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O/dev/null http://127.0.0.1:9090/-/healthy || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
     networks:
       - vibops_net
 
@@ -243,6 +332,12 @@ services:
       - "127.0.0.1:3000:3000"
     depends_on:
       - prometheus
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O/dev/null http://127.0.0.1:3000/api/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     networks:
       - vibops_net
 
