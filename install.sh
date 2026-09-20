@@ -20,7 +20,7 @@ set -euo pipefail
 # ─────────────────────────────────────────────────────────────────────────────
 
 VIBOPS_DIR="/opt/vibops"
-VIBOPS_VERSION="${VIBOPS_VERSION:-v0.45.1}"
+VIBOPS_VERSION="${VIBOPS_VERSION:-v0.45.2}"
 LLM_API_KEY="${LLM_API_KEY:-}"
 LLM_MODEL="${LLM_MODEL:-claude-sonnet-5}"
 LLM_PROVIDER="${LLM_PROVIDER:-claude}"
@@ -60,7 +60,7 @@ fail()  { echo -e "${RED}✗${NC} $1"; exit 1; }
 
 echo ""
 echo "╔══════════════════════════════════════════════════════╗"
-echo "║           VibOps — Installation v${VIBOPS_VERSION}            ║"
+echo "║           VibOps — Installation ${VIBOPS_VERSION}            ║"
 echo "╚══════════════════════════════════════════════════════╝"
 echo ""
 
