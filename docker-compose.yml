@@ -26,13 +26,19 @@ services:
     networks:
       - vibops_net
 
+# REDIS_PASSWORD has no default on purpose. It used to fall back to
+# `vibops-dev`, a password published in this very file at vibops.ai — anyone
+# starting the stack without a .env got a Redis protected by a string the whole
+# internet could read, and nothing said so. `:?` makes Compose refuse to start
+# and name the missing variable, which is the difference between a weak secret
+# and a stopped deployment. `install.sh` generates one with `openssl rand`.
   redis:
     image: redis:7-alpine
     container_name: vibops_redis
     restart: unless-stopped
-    command: redis-server --requirepass ${REDIS_PASSWORD:-vibops-dev}
+    command: redis-server --requirepass ${REDIS_PASSWORD:?REDIS_PASSWORD is required — generate one with `openssl rand -hex 24`}
     healthcheck:
-      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-vibops-dev}", "ping"]
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:?REDIS_PASSWORD is required — generate one with `openssl rand -hex 24`}", "ping"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -42,14 +48,14 @@ services:
   # ─── Core API ─────────────────────────────────────────────────────────────
 
   core:
-    image: ghcr.io/davidmacamara-boop/vibops-core:${VIBOPS_VERSION:-v0.45.0}
+    image: ghcr.io/davidmacamara-boop/vibops-core:${VIBOPS_VERSION:-v0.45.1}
     container_name: vibops_core
     restart: unless-stopped
     command: ["api"]
     env_file: .env
     environment:
       DATABASE_URL: postgresql+asyncpg://vibops:${POSTGRES_PASSWORD}@postgres:5432/vibops_db
-      REDIS_URL: redis://:${REDIS_PASSWORD:-vibops-dev}@redis:6379/0
+      REDIS_URL: redis://:${REDIS_PASSWORD:?REDIS_PASSWORD is required — generate one with `openssl rand -hex 24`}@redis:6379/0
     depends_on:
       postgres:
         condition: service_healthy
@@ -90,14 +96,14 @@ services:
   # ─── Worker + Beat ────────────────────────────────────────────────────────
 
   worker:
-    image: ghcr.io/davidmacamara-boop/vibops-worker:${VIBOPS_VERSION:-v0.45.0}
+    image: ghcr.io/davidmacamara-boop/vibops-worker:${VIBOPS_VERSION:-v0.45.1}
     container_name: vibops_worker
     restart: unless-stopped
     command: ["worker"]
     env_file: .env
     environment:
       DATABASE_URL: postgresql+asyncpg://vibops:${POSTGRES_PASSWORD}@postgres:5432/vibops_db
-      REDIS_URL: redis://:${REDIS_PASSWORD:-vibops-dev}@redis:6379/0
+      REDIS_URL: redis://:${REDIS_PASSWORD:?REDIS_PASSWORD is required — generate one with `openssl rand -hex 24`}@redis:6379/0
       DOCKER_HOST: tcp://docker-proxy:2375
     depends_on:
       postgres:
@@ -122,14 +128,14 @@ services:
       - vibops_net
 
   beat:
-    image: ghcr.io/davidmacamara-boop/vibops-core:${VIBOPS_VERSION:-v0.45.0}
+    image: ghcr.io/davidmacamara-boop/vibops-core:${VIBOPS_VERSION:-v0.45.1}
     container_name: vibops_beat
     restart: unless-stopped
     command: ["beat"]
     env_file: .env
     environment:
       DATABASE_URL: postgresql+asyncpg://vibops:${POSTGRES_PASSWORD}@postgres:5432/vibops_db
-      REDIS_URL: redis://:${REDIS_PASSWORD:-vibops-dev}@redis:6379/0
+      REDIS_URL: redis://:${REDIS_PASSWORD:?REDIS_PASSWORD is required — generate one with `openssl rand -hex 24`}@redis:6379/0
     depends_on:
       - redis
       - worker
@@ -190,7 +196,7 @@ services:
   # ─── Agent ────────────────────────────────────────────────────────────────
 
   agent:
-    image: ghcr.io/davidmacamara-boop/vibops-agent:${VIBOPS_VERSION:-v0.45.0}
+    image: ghcr.io/davidmacamara-boop/vibops-agent:${VIBOPS_VERSION:-v0.45.1}
     container_name: vibops_agent
     restart: unless-stopped
     env_file: .env
@@ -220,7 +226,7 @@ services:
   # ─── Console ──────────────────────────────────────────────────────────────
 
   console:
-    image: ghcr.io/davidmacamara-boop/vibops-console:${VIBOPS_VERSION:-v0.45.0}
+    image: ghcr.io/davidmacamara-boop/vibops-console:${VIBOPS_VERSION:-v0.45.1}
     container_name: vibops_console
     restart: unless-stopped
     env_file: .env
@@ -251,7 +257,7 @@ services:
   # ─── LLM Proxy ───────────────────────────────────────────────────────────
 
   llm-proxy:
-    image: ghcr.io/davidmacamara-boop/vibops-llm-proxy:${VIBOPS_VERSION:-v0.45.0}
+    image: ghcr.io/davidmacamara-boop/vibops-llm-proxy:${VIBOPS_VERSION:-v0.45.1}
     container_name: vibops_llm_proxy
     restart: unless-stopped
     environment:
@@ -325,7 +331,7 @@ services:
     restart: unless-stopped
     environment:
       GF_SECURITY_ADMIN_USER: admin
-      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-vibops}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:?GRAFANA_PASSWORD is required — generate one with `openssl rand -base64 16`}
     volumes:
       - grafana_data:/var/lib/grafana
     ports:
