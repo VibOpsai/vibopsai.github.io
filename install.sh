@@ -20,7 +20,7 @@ set -euo pipefail
 # ─────────────────────────────────────────────────────────────────────────────
 
 VIBOPS_DIR="/opt/vibops"
-VIBOPS_VERSION="${VIBOPS_VERSION:-v0.45.10}"
+VIBOPS_VERSION="${VIBOPS_VERSION:-v0.45.11}"
 LLM_API_KEY="${LLM_API_KEY:-}"
 LLM_MODEL="${LLM_MODEL:-claude-sonnet-5}"
 LLM_PROVIDER="${LLM_PROVIDER:-claude}"
@@ -29,6 +29,13 @@ ADMIN_PASSWORD="${ADMIN_PASSWORD:-}"
 # Nom de domaine du reverse proxy. Vide → Caddy ecoute en HTTP simple sur :80.
 # Renseigne → Caddy obtient un certificat Let's Encrypt et redirige HTTP vers HTTPS.
 VIBOPS_DOMAIN="${VIBOPS_DOMAIN:-}"
+# The compose file served here is pinned to this release by image digest, so it
+# belongs to this version and no other. Asking for a different --version means
+# taking that release's own file, which the install repository keeps under its
+# tag. Keeping one file and swapping a tag would have been the easy option and
+# the wrong one: Docker resolves the digest and ignores the tag, so --version
+# would have appeared to work while deploying this release's images.
+DEFAULT_VERSION="$VIBOPS_VERSION"
 COMPOSE_URL="https://vibops.ai/docker-compose.yml"
 
 # ── Parse args ───────────────────────────────────────────────────────────────
@@ -135,7 +142,12 @@ info "Install directory: $VIBOPS_DIR"
 # ── 4. Download docker-compose.yml ───────────────────────────────────────────
 
 if [[ ! -f docker-compose.yml ]]; then
-  curl -fsSL "$COMPOSE_URL" -o docker-compose.yml
+  if [[ "$VIBOPS_VERSION" != "$DEFAULT_VERSION" ]]; then
+    COMPOSE_URL="https://raw.githubusercontent.com/VibOpsai/vibops-install/${VIBOPS_VERSION}/docker-compose.yml"
+    info "Version ${VIBOPS_VERSION} requested — taking its own compose file"
+  fi
+  curl -fsSL "$COMPOSE_URL" -o docker-compose.yml \
+    || fail "Could not download ${COMPOSE_URL} — check that ${VIBOPS_VERSION} is a published release."
   info "Downloaded docker-compose.yml"
 else
   warn "docker-compose.yml already exists — keeping existing file"
