@@ -20,7 +20,7 @@ set -euo pipefail
 # ─────────────────────────────────────────────────────────────────────────────
 
 VIBOPS_DIR="/opt/vibops"
-VIBOPS_VERSION="${VIBOPS_VERSION:-v0.45.7}"
+VIBOPS_VERSION="${VIBOPS_VERSION:-v0.45.8}"
 LLM_API_KEY="${LLM_API_KEY:-}"
 LLM_MODEL="${LLM_MODEL:-claude-sonnet-5}"
 LLM_PROVIDER="${LLM_PROVIDER:-claude}"
@@ -72,9 +72,49 @@ fi
 
 # ── 2. Install Docker if missing ─────────────────────────────────────────────
 
+# Docker's own documentation says the get.docker.com convenience script is not
+# for production — and this script configures Let's Encrypt and calls itself the
+# production path, so it has no business using it. What follows is Docker's
+# documented production install: their signed apt repository, the key verified
+# by apt, packages pinned to a channel. It downloads data, not code to execute.
+#
+# Only Debian and Ubuntu, which are the only distributions this script claims to
+# support. Anything else stops with the command to run rather than guessing.
+install_docker() {
+  local os_id codename
+  . /etc/os-release
+  os_id="$ID"
+  codename="${VERSION_CODENAME:-}"
+
+  case "$os_id" in
+    ubuntu|debian) ;;
+    *)
+      fail "Docker is missing and this script installs it only on Ubuntu and Debian.
+      Install Docker Engine and the Compose plugin with your distribution's
+      documented procedure (https://docs.docker.com/engine/install/), then run
+      this script again."
+      ;;
+  esac
+
+  [[ -n "$codename" ]] || fail "Cannot read VERSION_CODENAME from /etc/os-release — install Docker manually."
+
+  apt-get update -qq
+  apt-get install -y -qq ca-certificates curl gnupg
+
+  install -m 0755 -d /etc/apt/keyrings
+  curl -fsSL "https://download.docker.com/linux/${os_id}/gpg" -o /etc/apt/keyrings/docker.asc
+  chmod a+r /etc/apt/keyrings/docker.asc
+
+  echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/${os_id} ${codename} stable" \
+    > /etc/apt/sources.list.d/docker.list
+
+  apt-get update -qq
+  apt-get install -y -qq docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+}
+
 if ! command -v docker &>/dev/null; then
-  warn "Docker not found — installing..."
-  curl -fsSL https://get.docker.com | bash
+  warn "Docker not found — installing from Docker's signed repository..."
+  install_docker
   systemctl enable --now docker
   info "Docker installed"
 else
