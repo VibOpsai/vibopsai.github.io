@@ -48,7 +48,7 @@ services:
   # ─── Core API ─────────────────────────────────────────────────────────────
 
   core:
-    image: ghcr.io/davidmacamara-boop/vibops-core@sha256:c2cf9c189a67ea263426f2284b901eebc98cc4ca4fc9330117b9401d9ccfbcaa
+    image: ghcr.io/davidmacamara-boop/vibops-core@sha256:1d00f6b14cddc7872f48ba7d6c81e234e7e0f97916955e53400b4439c39305c9
     container_name: vibops_core
     restart: unless-stopped
     command: ["api"]
@@ -96,7 +96,7 @@ services:
   # ─── Worker + Beat ────────────────────────────────────────────────────────
 
   worker:
-    image: ghcr.io/davidmacamara-boop/vibops-worker@sha256:245e818dbd2debe352df707baa585c3350c40ed0868fdfc69cea42e3630f7a33
+    image: ghcr.io/davidmacamara-boop/vibops-worker@sha256:cfb8dbf9dfb52c30d63a7343923cd5a4d7c61e5cb0b7e5e0da7cbc2cfd46521a
     container_name: vibops_worker
     restart: unless-stopped
     command: ["worker"]
@@ -105,6 +105,15 @@ services:
       DATABASE_URL: postgresql+asyncpg://vibops:${POSTGRES_PASSWORD}@postgres:5432/vibops_db
       REDIS_URL: redis://:${REDIS_PASSWORD:?REDIS_PASSWORD is required — generate one with `openssl rand -hex 24`}@redis:6379/0
       DOCKER_HOST: tcp://docker-proxy:2375
+      # Le worker s'enregistre lui-meme comme passerelle. Sans ces deux lignes
+      # il le fait sous son hostname — l'identifiant du conteneur — et garde son
+      # identite dans un fichier qu'aucun volume ne conserve : chaque
+      # `--force-recreate` laisse une passerelle orpheline de plus dans la
+      # console, nommee d'apres un conteneur mort. Sept sur la demo au 27/09/2026.
+      GATEWAY_NAME: ${GATEWAY_NAME:-vibops-worker}
+      VIBOPS_DATA_DIR: /var/lib/vibops
+    volumes:
+      - worker_data:/var/lib/vibops
     depends_on:
       postgres:
         condition: service_healthy
@@ -128,7 +137,7 @@ services:
       - vibops_net
 
   beat:
-    image: ghcr.io/davidmacamara-boop/vibops-core@sha256:c2cf9c189a67ea263426f2284b901eebc98cc4ca4fc9330117b9401d9ccfbcaa
+    image: ghcr.io/davidmacamara-boop/vibops-core@sha256:1d00f6b14cddc7872f48ba7d6c81e234e7e0f97916955e53400b4439c39305c9
     container_name: vibops_beat
     restart: unless-stopped
     command: ["beat"]
@@ -203,7 +212,7 @@ services:
   # ─── Agent ────────────────────────────────────────────────────────────────
 
   agent:
-    image: ghcr.io/davidmacamara-boop/vibops-agent@sha256:32c45a0df706fce9dff1d1fa5dd8155ac18e52720b60da2f99c8e6449a810f95
+    image: ghcr.io/davidmacamara-boop/vibops-agent@sha256:ac55afc4438b8379245cf5c9b69e684afda856d8d0654d8ea186c1cc0035944c
     container_name: vibops_agent
     restart: unless-stopped
     env_file: .env
@@ -233,7 +242,7 @@ services:
   # ─── Console ──────────────────────────────────────────────────────────────
 
   console:
-    image: ghcr.io/davidmacamara-boop/vibops-console@sha256:4f07b573676d4f2e7ac3bc2166ad55b41689cc453eed36fa72d9b54708ffe12c
+    image: ghcr.io/davidmacamara-boop/vibops-console@sha256:65398f53eddeabdf78534237e3ff881008bc5c2644e8997971c1ee35f72fd5db
     container_name: vibops_console
     restart: unless-stopped
     env_file: .env
@@ -264,7 +273,7 @@ services:
   # ─── LLM Proxy ───────────────────────────────────────────────────────────
 
   llm-proxy:
-    image: ghcr.io/davidmacamara-boop/vibops-llm-proxy@sha256:b16354df21b85fafdcc1379c1a4f226bcc5293320f9d88d4507babbc39a8b588
+    image: ghcr.io/davidmacamara-boop/vibops-llm-proxy@sha256:aac03d0ad413818e7e537b7ca700483b6a97cc63f6641fabe5a9df826918814a
     container_name: vibops_llm_proxy
     restart: unless-stopped
     environment:
@@ -362,6 +371,7 @@ volumes:
   caddy_data:
   caddy_config:
   console_data:
+  worker_data:
 
 networks:
   vibops_net:
