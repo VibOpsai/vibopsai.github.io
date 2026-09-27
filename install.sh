@@ -20,7 +20,7 @@ set -euo pipefail
 # ─────────────────────────────────────────────────────────────────────────────
 
 VIBOPS_DIR="/opt/vibops"
-VIBOPS_VERSION="${VIBOPS_VERSION:-v0.47.3}"
+VIBOPS_VERSION="${VIBOPS_VERSION:-v0.47.4}"
 LLM_API_KEY="${LLM_API_KEY:-}"
 LLM_MODEL="${LLM_MODEL:-claude-sonnet-5}"
 LLM_PROVIDER="${LLM_PROVIDER:-claude}"
@@ -175,14 +175,18 @@ if [[ ! -f Caddyfile ]]; then
 
   cat > Caddyfile <<CADDYEOF
 ${SITE_ADDRESS} {
-  handle /whisper {
-    root * /static
-    rewrite * /whisper.html
-    file_server
-  }
-  handle /whisper-api/* {
-    uri strip_prefix /whisper-api
-    reverse_proxy host.docker.internal:30181
+  # Connect parle a core, pas a la console. Sans cette regle, le relais final
+  # envoie tout vers console:8003, dont chaque route exige une session
+  # utilisateur — et un gateway presente un jeton de passerelle, pas un JWT.
+  # Il recoit alors 401, ce qui ressemble a un jeton invalide et n'en est pas
+  # un : le meme jeton fonctionne contre l'adresse interne. Mesure le
+  # 26/09/2026 ; sans cette route, aucune installation par defaut ne peut
+  # accueillir un site distant, ce qui est pourtant tout l'objet de Connect.
+  #
+  # Ces endpoints s'authentifient par jeton de passerelle, c'est leur
+  # mecanisme prevu. Ils sont les seuls de core exposes ici.
+  handle /api/v1/gateways/* {
+    reverse_proxy core:8000
   }
   reverse_proxy console:8003
 }
@@ -204,12 +208,15 @@ CADDYEOF
 fi
 
 # ── 4c. Static files ─────────────────────────────────────────────────────────
+#
+# Le repertoire existe parce que le compose le monte dans Caddy. Il est vide :
+# jusqu'au 26/09/2026 l'installateur telechargeait ici `whisper.html` depuis
+# vibops.ai et le Caddyfile genere lui reservait deux routes, dont une relayant
+# vers host.docker.internal:30181 — un port qui n'existe que sur la machine de
+# demonstration. Une experimentation partait ainsi chez chaque client, avec une
+# route morte devant elle.
 
 mkdir -p static
-if [[ ! -f static/whisper.html ]]; then
-  curl -fsSL "https://vibops.ai/static/whisper.html" -o static/whisper.html 2>/dev/null \
-    || info "Whisper test page not available — skipped"
-fi
 
 # ── 5. Generate .env ─────────────────────────────────────────────────────────
 

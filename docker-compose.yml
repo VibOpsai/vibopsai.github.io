@@ -48,7 +48,7 @@ services:
   # ─── Core API ─────────────────────────────────────────────────────────────
 
   core:
-    image: ghcr.io/davidmacamara-boop/vibops-core@sha256:fd042797b47252c4ae01a5343627331a1c852bf73a0f0e808773630e07172a51
+    image: ghcr.io/davidmacamara-boop/vibops-core@sha256:c2cf9c189a67ea263426f2284b901eebc98cc4ca4fc9330117b9401d9ccfbcaa
     container_name: vibops_core
     restart: unless-stopped
     command: ["api"]
@@ -96,7 +96,7 @@ services:
   # ─── Worker + Beat ────────────────────────────────────────────────────────
 
   worker:
-    image: ghcr.io/davidmacamara-boop/vibops-worker@sha256:4a21f892386f0794b6790082e168c5569c32148e69ff0482184baec4133d2115
+    image: ghcr.io/davidmacamara-boop/vibops-worker@sha256:245e818dbd2debe352df707baa585c3350c40ed0868fdfc69cea42e3630f7a33
     container_name: vibops_worker
     restart: unless-stopped
     command: ["worker"]
@@ -128,7 +128,7 @@ services:
       - vibops_net
 
   beat:
-    image: ghcr.io/davidmacamara-boop/vibops-core@sha256:fd042797b47252c4ae01a5343627331a1c852bf73a0f0e808773630e07172a51
+    image: ghcr.io/davidmacamara-boop/vibops-core@sha256:c2cf9c189a67ea263426f2284b901eebc98cc4ca4fc9330117b9401d9ccfbcaa
     container_name: vibops_beat
     restart: unless-stopped
     command: ["beat"]
@@ -170,9 +170,10 @@ services:
       sh -c '
         while true; do
           STAMP=$$(date -u +%Y-%m-%d);
-          DEST=/backups/vibops_$${STAMP}.sql.gz;
-          pg_dump -h postgres -U vibops -d vibops_db | gzip > $$DEST;
+          pg_dump -h postgres -U vibops -d vibops_db | gzip > /backups/vibops_$${STAMP}.sql.gz;
+          pg_dumpall -h postgres -U vibops --globals-only --no-role-passwords | gzip > /backups/globals_$${STAMP}.sql.gz;
           find /backups -name "vibops_*.sql.gz" -mtime +30 -delete;
+          find /backups -name "globals_*.sql.gz" -mtime +30 -delete;
           sleep 86400;
         done
       '
@@ -185,7 +186,13 @@ services:
       # tolerance couvrent un redemarrage sans masquer une boucle cassee — un
       # mot de passe errone laisse le processus vivant et /backups vide, etat
       # que « Up » ne distingue pas d'un fonctionnement normal.
-      test: ["CMD-SHELL", "find /backups -name 'vibops_*.sql.gz' -mtime -2 | grep -q . || exit 1"]
+      #
+      # Les deux fichiers sont exiges, pas seulement le dump de la base. Sans
+      # les globals, une restauration sur un cluster neuf echoue 57 fois sur
+      # `role "vibops_app" does not exist` — et psql sort quand meme en 0
+      # (exercice du 25/09/2026, ADR 0048). Une sauvegarde a moitie utilisable
+      # doit se voir avant l'incident, pas pendant.
+      test: ["CMD-SHELL", "find /backups -name 'vibops_*.sql.gz' -mtime -2 | grep -q . && find /backups -name 'globals_*.sql.gz' -mtime -2 | grep -q . || exit 1"]
       interval: 5m
       timeout: 10s
       retries: 3
@@ -196,7 +203,7 @@ services:
   # ─── Agent ────────────────────────────────────────────────────────────────
 
   agent:
-    image: ghcr.io/davidmacamara-boop/vibops-agent@sha256:d3b50edeab924137374f6ca4f8c177931cde24d669b20dfc56cf69801b877588
+    image: ghcr.io/davidmacamara-boop/vibops-agent@sha256:32c45a0df706fce9dff1d1fa5dd8155ac18e52720b60da2f99c8e6449a810f95
     container_name: vibops_agent
     restart: unless-stopped
     env_file: .env
@@ -226,7 +233,7 @@ services:
   # ─── Console ──────────────────────────────────────────────────────────────
 
   console:
-    image: ghcr.io/davidmacamara-boop/vibops-console@sha256:19f74229601f1fd5d391b893dc9bb3b3f422f2de2f72518ed5e0e1e1aca9593a
+    image: ghcr.io/davidmacamara-boop/vibops-console@sha256:4f07b573676d4f2e7ac3bc2166ad55b41689cc453eed36fa72d9b54708ffe12c
     container_name: vibops_console
     restart: unless-stopped
     env_file: .env
@@ -257,7 +264,7 @@ services:
   # ─── LLM Proxy ───────────────────────────────────────────────────────────
 
   llm-proxy:
-    image: ghcr.io/davidmacamara-boop/vibops-llm-proxy@sha256:71c87d7485b10ee44eec9e5c17fe0f13e79dfda4fd1e2f1d4b293733f0b75b6c
+    image: ghcr.io/davidmacamara-boop/vibops-llm-proxy@sha256:b16354df21b85fafdcc1379c1a4f226bcc5293320f9d88d4507babbc39a8b588
     container_name: vibops_llm_proxy
     restart: unless-stopped
     environment:
