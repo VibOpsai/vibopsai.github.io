@@ -20,7 +20,7 @@ set -euo pipefail
 # ─────────────────────────────────────────────────────────────────────────────
 
 VIBOPS_DIR="/opt/vibops"
-VIBOPS_VERSION="${VIBOPS_VERSION:-v0.48.3}"
+VIBOPS_VERSION="${VIBOPS_VERSION:-v0.48.4}"
 LLM_API_KEY="${LLM_API_KEY:-}"
 LLM_MODEL="${LLM_MODEL:-claude-sonnet-5}"
 LLM_PROVIDER="${LLM_PROVIDER:-claude}"
@@ -183,9 +183,23 @@ ${SITE_ADDRESS} {
   # 26/09/2026 ; sans cette route, aucune installation par defaut ne peut
   # accueillir un site distant, ce qui est pourtant tout l'objet de Connect.
   #
-  # Ces endpoints s'authentifient par jeton de passerelle, c'est leur
-  # mecanisme prevu. Ils sont les seuls de core exposes ici.
-  handle /api/v1/gateways/* {
+  # Les quatre chemins ci-dessous sont exactement ceux que connect appelle
+  # (worker.py : ping, jobs, jobs/{id}/claim, jobs/{id}/result), et tous
+  # s'authentifient par jeton de passerelle.
+  #
+  # Le motif etait `/api/v1/gateways/*`, et le commentaire affirmait que ces
+  # endpoints etaient « les seuls de core exposes ici ». C'etait faux : le
+  # prefixe couvre aussi GET /gateways/{id}, POST /{id}/scan et
+  # /gateways/gpu-utilization/live, qui s'authentifient par session
+  # utilisateur. Le navigateur n'envoie pas de JWT core sur ces appels — la
+  # console les relaie normalement — donc ils arrivaient a core sans identite.
+  # En APP_ENV=development, ou l'acces anonyme est actif, cela vaut la portee
+  # systeme : la colonne « GPU % » de la flotte lisait l'organisation systeme
+  # et non celle de l'operateur, et affichait « — » sur le seul cluster qui a
+  # un GPU. Constate sur la demo le 30/09/2026, depuis l'internet public et
+  # sans aucune authentification.
+  @connect path_regexp ^/api/v1/gateways/[^/]+/(ping|jobs)(/.*)?$
+  handle @connect {
     reverse_proxy core:8000
   }
   reverse_proxy console:8003
