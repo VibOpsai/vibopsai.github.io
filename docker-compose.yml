@@ -48,7 +48,7 @@ services:
   # ─── Core API ─────────────────────────────────────────────────────────────
 
   core:
-    image: ghcr.io/davidmacamara-boop/vibops-core@sha256:e4dc1220f0807b4dc3b4300d0da471c01b342ccf0a955fc1568028ce1a837c2b
+    image: ghcr.io/davidmacamara-boop/vibops-core@sha256:1d8158432bdae6a1173873f4ec39158fc5401fb338e1e7b91ccb8799a5975cde
     container_name: vibops_core
     restart: unless-stopped
     command: ["api"]
@@ -110,7 +110,7 @@ services:
   # ─── Worker + Beat ────────────────────────────────────────────────────────
 
   worker:
-    image: ghcr.io/davidmacamara-boop/vibops-worker@sha256:de90730f9d9c56f5d4ac8168b8fb9ec01457e2768f500c20fae88074b90eadc7
+    image: ghcr.io/davidmacamara-boop/vibops-worker@sha256:abd0c704959d6172ef6a3e8ccbbd808f3faeade2cb5f65b83a745684aa305192
     container_name: vibops_worker
     restart: unless-stopped
     command: ["worker"]
@@ -151,7 +151,7 @@ services:
       - vibops_net
 
   beat:
-    image: ghcr.io/davidmacamara-boop/vibops-core@sha256:e4dc1220f0807b4dc3b4300d0da471c01b342ccf0a955fc1568028ce1a837c2b
+    image: ghcr.io/davidmacamara-boop/vibops-core@sha256:1d8158432bdae6a1173873f4ec39158fc5401fb338e1e7b91ccb8799a5975cde
     container_name: vibops_beat
     restart: unless-stopped
     command: ["beat"]
@@ -251,7 +251,7 @@ services:
   # ─── Agent ────────────────────────────────────────────────────────────────
 
   agent:
-    image: ghcr.io/davidmacamara-boop/vibops-agent@sha256:a53e825a6101493b7d7e5949aac784fcd3e896bdfc6673f7297a0535ca8f37d8
+    image: ghcr.io/davidmacamara-boop/vibops-agent@sha256:af808ac42562854711653268486fbd45c9ce26c10a8f2e4ece378adbe2c18c56
     container_name: vibops_agent
     restart: unless-stopped
     env_file: .env
@@ -281,7 +281,7 @@ services:
   # ─── Console ──────────────────────────────────────────────────────────────
 
   console:
-    image: ghcr.io/davidmacamara-boop/vibops-console@sha256:f3f11c128f4754e9e72b52d00c4d3b7963e05f346ea34db377f8613c8180e297
+    image: ghcr.io/davidmacamara-boop/vibops-console@sha256:5e01ca0d8548d0be67bdec34d1b2758ef2c8317fbf8f1e53907a8df5f6162510
     container_name: vibops_console
     restart: unless-stopped
     env_file: .env
@@ -312,7 +312,7 @@ services:
   # ─── LLM Proxy ───────────────────────────────────────────────────────────
 
   llm-proxy:
-    image: ghcr.io/davidmacamara-boop/vibops-llm-proxy@sha256:86353cc967456d44337203f6ab90a213f74bb4cb4fd4f5648c828892e49c87e9
+    image: ghcr.io/davidmacamara-boop/vibops-llm-proxy@sha256:effc5c7c420d64c4c697b81a4e6d216e43f409f0c1e6bb1fd60621a0457b0ce4
     container_name: vibops_llm_proxy
     restart: unless-stopped
     environment:
