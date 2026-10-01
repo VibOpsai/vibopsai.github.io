@@ -20,7 +20,7 @@ set -euo pipefail
 # ─────────────────────────────────────────────────────────────────────────────
 
 VIBOPS_DIR="/opt/vibops"
-VIBOPS_VERSION="${VIBOPS_VERSION:-v0.48.8}"
+VIBOPS_VERSION="${VIBOPS_VERSION:-v0.48.9}"
 LLM_API_KEY="${LLM_API_KEY:-}"
 LLM_MODEL="${LLM_MODEL:-claude-sonnet-5}"
 LLM_PROVIDER="${LLM_PROVIDER:-claude}"
@@ -223,14 +223,11 @@ fi
 
 # ── 4c. Static files ─────────────────────────────────────────────────────────
 #
-# Le repertoire existe parce que le compose le monte dans Caddy. Il est vide :
-# jusqu'au 26/09/2026 l'installateur telechargeait ici `whisper.html` depuis
-# vibops.ai et le Caddyfile genere lui reservait deux routes, dont une relayant
-# vers host.docker.internal:30181 — un port qui n'existe que sur la machine de
-# demonstration. Une experimentation partait ainsi chez chaque client, avec une
-# route morte devant elle.
-
-mkdir -p static
+# Plus de `mkdir -p static` : il n'existait que parce que le compose montait
+# ./static dans Caddy, et ce montage ne servait plus rien depuis le retrait de
+# l'experimentation whisper le 26/09/2026 — aucune directive du Caddyfile ne
+# lit /static, la console servant ses propres fichiers depuis son conteneur.
+# Le montage restait, donc Docker creait un repertoire vide chez chaque client.
 
 # ── 5. Generate .env ─────────────────────────────────────────────────────────
 
