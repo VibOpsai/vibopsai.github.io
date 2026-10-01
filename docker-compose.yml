@@ -48,7 +48,7 @@ services:
   # ─── Core API ─────────────────────────────────────────────────────────────
 
   core:
-    image: ghcr.io/davidmacamara-boop/vibops-core@sha256:edc2c0aa660255324904f13c2caafc4e32acbefa0c4b05c6e4f68d0a4d563c9c
+    image: ghcr.io/davidmacamara-boop/vibops-core@sha256:25809102c277d38925b034d6398cfa582b776900936a9d1014c06910cc58c7cb
     container_name: vibops_core
     restart: unless-stopped
     command: ["api"]
@@ -61,6 +61,20 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+    # Boucle locale seulement, comme `agent` juste en dessous.
+    #
+    # core n'etait publie sur aucun port, et tout passe par Caddy — qui route
+    # vers la console ; la console, elle, ne relaie pas /api/v1/health. Donc
+    # l'etape 4 du manuel (`curl http://localhost:8000/api/v1/health`) et
+    # `make check` echouaient sur une installation parfaitement saine, et
+    # `make quickstart` sortait en erreur apres avoir tout demarre. L'hote de
+    # demo portait meme un conteneur `socat` dedie pour contourner ca.
+    #
+    # 127.0.0.1 et non 0.0.0.0 : rien de nouveau n'est expose au reseau, c'est
+    # le meme traitement que postgres, agent, prometheus et grafana dans ce
+    # fichier. Constate le 01/10/2026 en deroulant Option B sur un hote amd64.
+    ports:
+      - "127.0.0.1:8000:8000"
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/health')\" 2>/dev/null || exit 1"]
       interval: 10s
@@ -96,7 +110,7 @@ services:
   # ─── Worker + Beat ────────────────────────────────────────────────────────
 
   worker:
-    image: ghcr.io/davidmacamara-boop/vibops-worker@sha256:4120f9dd73dfbeeebf0a88c9a856a65fcafe626fe0ed29f12ed7aee5c837234a
+    image: ghcr.io/davidmacamara-boop/vibops-worker@sha256:2ca89ac21746c01ae8c2f5af9ea201c4ab8b9905a732c4e0845ed7883e991827
     container_name: vibops_worker
     restart: unless-stopped
     command: ["worker"]
@@ -137,7 +151,7 @@ services:
       - vibops_net
 
   beat:
-    image: ghcr.io/davidmacamara-boop/vibops-core@sha256:edc2c0aa660255324904f13c2caafc4e32acbefa0c4b05c6e4f68d0a4d563c9c
+    image: ghcr.io/davidmacamara-boop/vibops-core@sha256:25809102c277d38925b034d6398cfa582b776900936a9d1014c06910cc58c7cb
     container_name: vibops_beat
     restart: unless-stopped
     command: ["beat"]
@@ -212,7 +226,7 @@ services:
   # ─── Agent ────────────────────────────────────────────────────────────────
 
   agent:
-    image: ghcr.io/davidmacamara-boop/vibops-agent@sha256:046148beb28a554dde7112625c816d03c20d48c1c742b500c1857a34b2a51f39
+    image: ghcr.io/davidmacamara-boop/vibops-agent@sha256:b2602855d13cd1d987b9f8f001374fc960821d9fe0a0deb74e9f0cb848228168
     container_name: vibops_agent
     restart: unless-stopped
     env_file: .env
@@ -242,7 +256,7 @@ services:
   # ─── Console ──────────────────────────────────────────────────────────────
 
   console:
-    image: ghcr.io/davidmacamara-boop/vibops-console@sha256:dd5104e1a908a781a91744d7486850a7ea1327d8fc89874606a21023a87564f5
+    image: ghcr.io/davidmacamara-boop/vibops-console@sha256:ad7415f5efbbec96ae21fc501d65079b990a854bbf843df43e94297b2cc80697
     container_name: vibops_console
     restart: unless-stopped
     env_file: .env
@@ -273,7 +287,7 @@ services:
   # ─── LLM Proxy ───────────────────────────────────────────────────────────
 
   llm-proxy:
-    image: ghcr.io/davidmacamara-boop/vibops-llm-proxy@sha256:75ba5eba967576bf32475fb0e3dcc36b6a62cfc3b18a0e2aea84cbffdeb2b83a
+    image: ghcr.io/davidmacamara-boop/vibops-llm-proxy@sha256:b05bcb4095057b9a8a6f107d83204e21be6a1efd61115489180b7fa88f258c54
     container_name: vibops_llm_proxy
     restart: unless-stopped
     environment:
