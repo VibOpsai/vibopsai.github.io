@@ -20,7 +20,7 @@ set -euo pipefail
 # ─────────────────────────────────────────────────────────────────────────────
 
 VIBOPS_DIR="/opt/vibops"
-VIBOPS_VERSION="${VIBOPS_VERSION:-v0.48.6}"
+VIBOPS_VERSION="${VIBOPS_VERSION:-v0.48.7}"
 LLM_API_KEY="${LLM_API_KEY:-}"
 LLM_MODEL="${LLM_MODEL:-claude-sonnet-5}"
 LLM_PROVIDER="${LLM_PROVIDER:-claude}"
@@ -278,7 +278,6 @@ INTERNAL_API_KEY=${INTERNAL_API_KEY}
 # ─── Auth ───────────────────────────────────────────────────
 ADMIN_EMAIL=${ADMIN_EMAIL}
 ADMIN_PASSWORD=${ADMIN_PASSWORD}
-AUTH_USERNAME=admin
 AUTH_PASSWORD_HASH=${AUTH_PASSWORD_HASH}
 JWT_SECRET_KEY=${JWT_SECRET_KEY}
 JWT_EXPIRE_HOURS=24
