@@ -1,0 +1,36 @@
+# Reverse proxy par defaut — copie en `Caddyfile` par `make quickstart`.
+#
+# Il manquait. `install/docker-compose.yml` monte `./Caddyfile` en lecture seule
+# dans le conteneur caddy, et le depot d'installation n'en livrait aucun :
+# Docker creait alors un REPERTOIRE vide a ce chemin — son comportement quand la
+# source d'un montage est absente — et le conteneur echouait sur
+# « Are you trying to mount a directory onto a file ? ». `make quickstart`
+# s'arretait donc sur le dernier service, apres avoir demarre les six autres.
+#
+# `install.sh` ecrit le sien, avec le domaine substitue ; c'est pourquoi ce
+# chemin-la fonctionnait et pas le clone + quickstart. Constate le 01/10/2026 en
+# deroulant Option B sur un hote amd64.
+#
+# Un fichier `.example` plutot qu'un `Caddyfile` livre tel quel : `install.sh`
+# teste `[[ ! -f Caddyfile ]]` avant d'ecrire le sien, et un fichier deja
+# present l'empecherait de poser le domaine — donc de demander un certificat.
+#
+# ── HTTPS ────────────────────────────────────────────────────────────────────
+# Remplacer `:80` par votre domaine et Caddy obtient le certificat seul.
+# Sans domaine, tout circule en clair : mots de passe et jetons compris.
+:80 {
+  # Connect parle a core, pas a la console. Chaque route de la console exige une
+  # session utilisateur, et une passerelle presente un jeton de passerelle, pas
+  # un JWT : sans cette regle elle recoit 401, ce qui ressemble a un jeton
+  # invalide et n'en est pas un.
+  #
+  # Ces quatre chemins sont exactement ceux que connect appelle (worker.py :
+  # ping, jobs, jobs/{id}/claim, jobs/{id}/result), et tous s'authentifient par
+  # jeton de passerelle. Le motif large `/api/v1/gateways/*` couvrait aussi des
+  # routes a session, qui arrivaient alors a core sans identite.
+  @connect path_regexp ^/api/v1/gateways/[^/]+/(ping|jobs)(/.*)?$
+  handle @connect {
+    reverse_proxy core:8000
+  }
+  reverse_proxy console:8003
+}
