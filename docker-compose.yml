@@ -48,7 +48,7 @@ services:
   # ─── Core API ─────────────────────────────────────────────────────────────
 
   core:
-    image: ghcr.io/davidmacamara-boop/vibops-core@sha256:0b7edac26ea4a0061fe7d0376551077537614c1680427efdce94fa9572bb4a9c
+    image: ghcr.io/davidmacamara-boop/vibops-core@sha256:83d4d4fd298528d072fc5187d26e964fa1a45b778633621708c1882d9209cfba
     container_name: vibops_core
     restart: unless-stopped
     command: ["api"]
@@ -110,7 +110,7 @@ services:
   # ─── Worker + Beat ────────────────────────────────────────────────────────
 
   worker:
-    image: ghcr.io/davidmacamara-boop/vibops-worker@sha256:14560a892881a0951d3a7f03881a2d65e3173c54ebe4a9b50a8de2cc20954c45
+    image: ghcr.io/davidmacamara-boop/vibops-worker@sha256:6fec8bc2409205f131e6a7c835e139f00ecb2fb94563d3a733abf982b77944dd
     container_name: vibops_worker
     restart: unless-stopped
     command: ["worker"]
@@ -151,7 +151,7 @@ services:
       - vibops_net
 
   beat:
-    image: ghcr.io/davidmacamara-boop/vibops-core@sha256:0b7edac26ea4a0061fe7d0376551077537614c1680427efdce94fa9572bb4a9c
+    image: ghcr.io/davidmacamara-boop/vibops-core@sha256:83d4d4fd298528d072fc5187d26e964fa1a45b778633621708c1882d9209cfba
     container_name: vibops_beat
     restart: unless-stopped
     command: ["beat"]
@@ -171,7 +171,18 @@ services:
       #
       # `| grep -q .` parce que `find` rend 0 meme sans resultat : sans lui la
       # sonde reussirait sur un fichier vieux d'un mois.
-      test: ["CMD-SHELL", "find /app/celerybeat-schedule -mmin -10 | grep -q . || exit 1"]
+      # Le chemin que l'entrypoint ecrit vraiment, et la meme variable que lui.
+      #
+      # La sonde regardait /app/celerybeat-schedule, l'ancien defaut de
+      # PersistentScheduler. L'entrypoint ecrit dans /tmp depuis qu'il a fallu
+      # survivre a un systeme de fichiers racine en lecture seule — ce que le
+      # chart impose, a raison. `find` ne trouvait donc jamais rien et **beat
+      # etait unhealthy sur toute installation**, pendant que les douze autres
+      # services etaient sains et que tout fonctionnait. Trouve le 02/10/2026
+      # par le job qui installe le produit, a sa premiere execution.
+      #
+      # `$$` pour que le shell du conteneur developpe la variable, et non compose.
+      test: ["CMD-SHELL", "find $${CELERYBEAT_SCHEDULE:-/tmp/celerybeat-schedule} -mmin -10 | grep -q . || exit 1"]
       interval: 60s
       timeout: 10s
       retries: 3
@@ -251,7 +262,7 @@ services:
   # ─── Agent ────────────────────────────────────────────────────────────────
 
   agent:
-    image: ghcr.io/davidmacamara-boop/vibops-agent@sha256:d822a0398a94a9f017b34fe8776829b605ffbc888b9e760c092c80624b3cce74
+    image: ghcr.io/davidmacamara-boop/vibops-agent@sha256:a01ac58d3a5051954cdb37af40cf2cc5d934cebff68fade84cb13f08be7de9ce
     container_name: vibops_agent
     restart: unless-stopped
     env_file: .env
@@ -281,7 +292,7 @@ services:
   # ─── Console ──────────────────────────────────────────────────────────────
 
   console:
-    image: ghcr.io/davidmacamara-boop/vibops-console@sha256:df418f2bdf9d95cbceed53e02840c3daff02a59582e5d9c5084e254357f0fd12
+    image: ghcr.io/davidmacamara-boop/vibops-console@sha256:f73d82e150fdf6549e33977a369bd40d70fdda81bb014b8adda7eb4402fd0e9d
     container_name: vibops_console
     restart: unless-stopped
     env_file: .env
@@ -311,8 +322,55 @@ services:
 
   # ─── LLM Proxy ───────────────────────────────────────────────────────────
 
+  # ─── VibOps Connect (profil « connect ») ──────────────────────────────────
+  #
+  # Une passerelle qui tourne sur cette machine et surveille un cluster joignable
+  # par votre kubeconfig — kind, minikube, ou un contexte distant. C'est la
+  # methode B de la section 6, et `scripts/connect-setup.sh` la pilote.
+  #
+  # Ce service n'existait que dans le compose de developpement, avec un contexte
+  # de build que ce depot ne contient pas : `connect-setup.sh --start` echouait
+  # donc deux fois sur une installation cliente — pas de service `connect`, et
+  # rien a construire. Il part desormais d'une image publiee.
+  #
+  # Sous profil, donc inerte tant qu'on ne demande pas `--profile connect`.
+  connect:
+    image: ghcr.io/davidmacamara-boop/vibops-connect@sha256:9fc55193a1f8e3983c78ae562a7b2a9cdef9952d77eb5dfbeaf76683b6cd40bd
+    container_name: vibops_connect
+    restart: unless-stopped
+    profiles: ["connect"]
+    environment:
+      # Par defaut le core de cette pile ; mettez l'URL publique pour un site
+      # distant, qui doit alors traverser Caddy.
+      VIBOPS_CORE_URL: ${VIBOPS_CORE_URL:-http://core:8000}
+      VIBOPS_GATEWAY_ID: ${CONNECT_GATEWAY_ID:-}
+      VIBOPS_TOKEN: ${CONNECT_TOKEN:-}
+      # Le nom sous lequel ce cluster se declare. Laisse vide, la passerelle
+      # prend le contexte du kubeconfig — et deux sites peuvent alors se
+      # disputer le meme nom.
+      VIBOPS_CLUSTER_NAME: ${CONNECT_CLUSTER_NAME:-}
+      KUBECONFIG: /home/vibops/.kube/config
+    volumes:
+      - ${HOME}/.kube:/home/vibops/.kube:ro
+    # Ce qui se verifie est qu'il PARLE au core, pas qu'il tourne.
+    #
+    # Connect n'ecoute aucun port : une sonde ne peut rien interroger. Il touche
+    # donc un fichier apres chaque ping accepte, et c'est ce fichier qu'on
+    # regarde — une passerelle dont le jeton est refuse ne le touche jamais, et
+    # se declare malade au lieu de paraitre « Up ».
+    #
+    # Trois minutes de marge sur un ping toutes les trente secondes.
+    healthcheck:
+      test: ["CMD-SHELL", "find $${VIBOPS_HEARTBEAT_FILE:-/tmp/vibops-connect-heartbeat} -mmin -3 | grep -q . || exit 1"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 90s
+    networks:
+      - vibops_net
+
   llm-proxy:
-    image: ghcr.io/davidmacamara-boop/vibops-llm-proxy@sha256:96ad33331ab3bba33ecd156591c1c103528fd6b71108afcd4e6171f91a95af35
+    image: ghcr.io/davidmacamara-boop/vibops-llm-proxy@sha256:1d31a39f4809d0a4d78e0fd489546984254ba64b7456876172a96e4fe7317c7e
     container_name: vibops_llm_proxy
     restart: unless-stopped
     # Boucle locale, et c'est tout ce qu'on peut faire par defaut.
