@@ -112,6 +112,27 @@ wait-healthy:
 # `up -d` et non `restart` : il faut recreer les conteneurs pour que les
 # nouvelles images ET le .env courant soient pris.
 update:
+	@# Rafraichir le clone d'abord, sinon rien ne change.
+	@#
+	@# Le compose publie epingle ses images par digest — c'est voulu, un tag est
+	@# un pointeur que son proprietaire peut deplacer. Mais `docker compose pull`
+	@# sur un digest rend toujours les memes octets : cette cible re-tirait des
+	@# images identiques et recreait les conteneurs sans rien changer de version.
+	@# La mise a jour vient du depot, pas du registre. Mesure le 02/10/2026 sur
+	@# une installation publiee.
+	@if [ -d .git ]; then \
+		echo "→ Refreshing the install repository..."; \
+		git pull --ff-only || { \
+			echo ""; \
+			echo "✗ git pull failed. Resolve it, then run make update again."; \
+			echo "  Your .env and Caddyfile are untracked and were not touched."; \
+			exit 1; \
+		}; \
+	else \
+		echo "⚠ Not a git clone — skipping the repository refresh."; \
+		echo "  The compose file pins images by digest, so pulling alone changes nothing."; \
+		echo "  Fetch the new docker-compose.yml yourself before running this."; \
+	fi
 	@echo "→ Pulling the published images..."
 	docker compose pull
 	@echo "→ Recreating the services..."
