@@ -20,7 +20,7 @@ set -euo pipefail
 # ─────────────────────────────────────────────────────────────────────────────
 
 VIBOPS_DIR="/opt/vibops"
-VIBOPS_VERSION="${VIBOPS_VERSION:-v0.51.2}"
+VIBOPS_VERSION="${VIBOPS_VERSION:-v0.51.3}"
 LLM_API_KEY="${LLM_API_KEY:-}"
 LLM_MODEL="${LLM_MODEL:-claude-sonnet-5}"
 LLM_PROVIDER="${LLM_PROVIDER:-claude}"
@@ -141,6 +141,38 @@ info "Docker Compose $(docker compose version --short)"
 mkdir -p "$VIBOPS_DIR"
 cd "$VIBOPS_DIR"
 info "Install directory: $VIBOPS_DIR"
+
+# Deux installations VibOps ne peuvent pas coexister sur un hote, et le
+# decouvrir en route coute l'installation en place.
+#
+# Le compose publie fixe les noms de conteneurs (`container_name: vibops_core`),
+# et Compose derive le nom de projet du nom du repertoire. Un `--dir` qui finit
+# par « vibops » retombe donc sur le meme projet : Compose fusionne les deux
+# fichiers de configuration et **recree les conteneurs de l'installation
+# existante** avec la configuration de la nouvelle. Un `--dir` different ne sauve
+# rien non plus — les noms de conteneurs, eux, sont les memes.
+#
+# Constate le 02/10/2026 sur l'hote de la demo : `--dir /root/essai/vibops` a
+# adopte la pile de /opt/vibops, recree son Caddy, et l'installation s'est
+# arretee sur « Bind for 127.0.0.1:8000 failed: port is already allocated ». Le
+# depot avait anticipe la reprise — le Caddyfile et le compose existants sont
+# conserves — mais pas l'adoption d'une installation voisine.
+#
+# Relancer le script dans le MEME repertoire reste permis : c'est la facon
+# documentee de reparer ou de completer une installation.
+if command -v docker &>/dev/null; then
+  _ailleurs=$(docker inspect vibops_core \
+    --format '{{index .Config.Labels "com.docker.compose.project.working_dir"}}' 2>/dev/null || true)
+  if [[ -n "$_ailleurs" && "$_ailleurs" != "$VIBOPS_DIR" ]]; then
+    err "Une installation VibOps existe deja sur cet hote, dans ${_ailleurs}.
+  Les deux partageraient les memes noms de conteneurs : continuer recreerait
+  cette installation-la avec la configuration de celle-ci.
+
+  Pour la mettre a jour :      bash install.sh --dir ${_ailleurs} …
+  Pour la remplacer :          (cd ${_ailleurs} && docker compose down) puis relancez
+  Pour l'inspecter d'abord :   (cd ${_ailleurs} && docker compose ps)"
+  fi
+fi
 
 # ── 4. Download docker-compose.yml ───────────────────────────────────────────
 
