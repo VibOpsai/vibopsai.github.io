@@ -48,7 +48,7 @@ services:
   # ─── Core API ─────────────────────────────────────────────────────────────
 
   core:
-    image: ghcr.io/davidmacamara-boop/vibops-core@sha256:4d817e3a545e56b16a56e70927c78ac1d1aa13a4606801a6dd9288280fc02857
+    image: ghcr.io/davidmacamara-boop/vibops-core@sha256:93a785f603d658afab607676704798f7a35bc65955ddeeb4540fd7f5bd011181
     container_name: vibops_core
     restart: unless-stopped
     command: ["api"]
@@ -110,7 +110,7 @@ services:
   # ─── Worker + Beat ────────────────────────────────────────────────────────
 
   worker:
-    image: ghcr.io/davidmacamara-boop/vibops-worker@sha256:f4e5d4c31a3bcd635d6c442882e2db715b00c69a3a1b8ba893fbb5bfb495a356
+    image: ghcr.io/davidmacamara-boop/vibops-worker@sha256:79e2f032dac27d5e92ce53153adeb4be68c6b675e7b158f2ecd652f2c2660912
     container_name: vibops_worker
     restart: unless-stopped
     command: ["worker"]
@@ -151,7 +151,7 @@ services:
       - vibops_net
 
   beat:
-    image: ghcr.io/davidmacamara-boop/vibops-core@sha256:4d817e3a545e56b16a56e70927c78ac1d1aa13a4606801a6dd9288280fc02857
+    image: ghcr.io/davidmacamara-boop/vibops-core@sha256:93a785f603d658afab607676704798f7a35bc65955ddeeb4540fd7f5bd011181
     container_name: vibops_beat
     restart: unless-stopped
     command: ["beat"]
@@ -251,7 +251,7 @@ services:
   # ─── Agent ────────────────────────────────────────────────────────────────
 
   agent:
-    image: ghcr.io/davidmacamara-boop/vibops-agent@sha256:1b221350cd356e43d2ec1d1ac74db415bf79c989e1cd90decedc59668d17cff3
+    image: ghcr.io/davidmacamara-boop/vibops-agent@sha256:7fc6a79d0ed5fc75129dc780b1739f16ceea6aff00b6b4d4a984a77ddbe4603b
     container_name: vibops_agent
     restart: unless-stopped
     env_file: .env
@@ -281,7 +281,7 @@ services:
   # ─── Console ──────────────────────────────────────────────────────────────
 
   console:
-    image: ghcr.io/davidmacamara-boop/vibops-console@sha256:b95e3bacc167cb8fc436ad21a9fc93a94671f8084769d17b0ba97cf793ca8f2d
+    image: ghcr.io/davidmacamara-boop/vibops-console@sha256:e906884ea4a99d7f880cd3de305af3ab4e3963183dc4428f408891a2cde2fc4f
     container_name: vibops_console
     restart: unless-stopped
     env_file: .env
@@ -312,9 +312,26 @@ services:
   # ─── LLM Proxy ───────────────────────────────────────────────────────────
 
   llm-proxy:
-    image: ghcr.io/davidmacamara-boop/vibops-llm-proxy@sha256:ddb6f81e3082230ab3558be0948c1a57a6a6ae1171d275732c7defbeb6ed99e0
+    image: ghcr.io/davidmacamara-boop/vibops-llm-proxy@sha256:ccc73461a7843e108ad6aef7c57ee55150194b3e5af61d3642b318277ab8edf3
     container_name: vibops_llm_proxy
     restart: unless-stopped
+    # Boucle locale, et c'est tout ce qu'on peut faire par defaut.
+    #
+    # Le service n'etait publie sur aucun port : les quatre commandes de la
+    # section 12 du manuel — dont `curl http://SERVER_IP:8004/health` — rendaient
+    # 000, et le propos de cette section est justement qu'un agent exterieur
+    # (n8n, LangChain, CrewAI, Dify) pointe dessus. Seul
+    # `http://llm-proxy:8004/health` repondait, depuis le reseau docker. Mesure
+    # le 02/10/2026.
+    #
+    # 127.0.0.1 et non 0.0.0.0 parce que le proxy ne s'authentifie pas : il
+    # relaie vers les serveurs d'inference et attribue les couts au nom d'un
+    # en-tete `X-VibOps-Agent-Id` qu'il croit sur parole. L'exposer au reseau
+    # donnerait a quiconque le droit de depenser le budget d'inference du
+    # client. Le manuel dit comment l'ouvrir deliberement, et ce qu'il faut
+    # mettre devant.
+    ports:
+      - "127.0.0.1:8004:8004"
     environment:
       CORE_API_URL: http://core:8000
       INTERNAL_API_KEY: ${INTERNAL_API_KEY:-}
