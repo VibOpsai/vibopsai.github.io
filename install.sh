@@ -20,7 +20,7 @@ set -euo pipefail
 # ─────────────────────────────────────────────────────────────────────────────
 
 VIBOPS_DIR="/opt/vibops"
-VIBOPS_VERSION="${VIBOPS_VERSION:-v0.49.5}"
+VIBOPS_VERSION="${VIBOPS_VERSION:-v0.49.6}"
 LLM_API_KEY="${LLM_API_KEY:-}"
 LLM_MODEL="${LLM_MODEL:-claude-sonnet-5}"
 LLM_PROVIDER="${LLM_PROVIDER:-claude}"
@@ -162,7 +162,12 @@ fi
 # trois fichiers — donc toutes ces commandes repondaient
 # « make: *** No rule to make target ». Non bloquant : le script fonctionne sans.
 if [[ ! -f Makefile ]]; then
-  if curl -fsSL "${COMPOSE_URL%/docker-compose.yml}/Makefile" -o Makefile 2>/dev/null; then
+  # `vibops-Makefile`, pas `Makefile` : vibops.ai est servi par GitHub Pages, et
+  # Jekyll exclut par defaut les fichiers nommes `Makefile`. L'adresse rendait
+  # donc 404 — verifie le 02/10/2026 — pendant que `SHA256SUMS`, sans extension
+  # lui aussi, etait bien servi. Le nom publie differe, le fichier pose garde le
+  # sien.
+  if curl -fsSL "${COMPOSE_URL%/docker-compose.yml}/vibops-Makefile" -o Makefile 2>/dev/null; then
     info "Downloaded Makefile (make check, make hash, make update…)"
   else
     warn "Makefile indisponible — les commandes \`make\` du manuel ne fonctionneront pas ici."
@@ -447,7 +452,18 @@ if [[ -z "$LLM_API_KEY" ]]; then
   warn "  C'est attendu — en production il refuse de demarrer sans cle."
   warn "  Pour le reparer, posez la cle dans ${VIBOPS_DIR}/.env puis :"
   echo "  docker compose -f ${VIBOPS_DIR}/docker-compose.yml up -d agent"
-  warn "  `up -d`, pas `restart` : `restart` relance le conteneur existant avec"
+  # Des guillemets simples, pas des accents graves : dans une chaine entre
+  # guillemets doubles, bash prend les accents graves pour une substitution de
+  # commande. Ce message imprimait donc « up: command not found », deux fois
+  # « restart: command not found », et sortait ampute de ses trois mots :
+  #
+  #     install.sh: line 450: up: command not found
+  #     ⚠   , pas  :  relance le conteneur existant avec
+  #
+  # Dans un script qu'on fait executer en root, et dans la ligne meme qui
+  # explique comment reparer l'agent. Constate le 02/10/2026 en rejouant
+  # l'option A apres l'avoir corrigee.
+  warn "  'up -d', pas 'restart' : 'restart' relance le conteneur existant avec"
   warn "  ses anciennes variables et ne relit pas .env."
 fi
 
