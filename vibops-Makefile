@@ -9,6 +9,8 @@
 #   make logs SERVICE=core            # tail logs for a service
 #   make pilot-create-client ORG=acme EMAIL=admin@acme.com PASSWORD=s3cr3t
 #   make pilot-create-client ORG=acme EMAIL=admin@acme.com PASSWORD=s3cr3t BUDGET=5000
+#
+#   make licence CUSTOMER="Oreus" PLAN=pro DAYS=365   # depot produit uniquement
 
 .PHONY: up down logs quickstart check update debug hash wait-healthy pilot-create-client backup-now backup-list help
 
@@ -34,6 +36,7 @@ quickstart:
 		PGPASS=$$(openssl rand -hex 16); \
 		GRAFPASS=$$(openssl rand -hex 12); \
 		REDISPASS=$$(openssl rand -hex 24); \
+		BACKUPPASS=$$(openssl rand -hex 32); \
 		sed -i.bak "s/change-me-in-production/$$SECRET/" .env; \
 		sed -i.bak "s/change-me-jwt-secret-in-production/$$JWT/" .env; \
 		sed -i.bak "s/^POSTGRES_PASSWORD=$$/POSTGRES_PASSWORD=$$PGPASS/" .env; \
@@ -41,8 +44,12 @@ quickstart:
 		sed -i.bak "s/^GRAFANA_PASSWORD=$$/GRAFANA_PASSWORD=$$GRAFPASS/" .env; \
 		sed -i.bak "s/^REDIS_PASSWORD=$$/REDIS_PASSWORD=$$REDISPASS/" .env; \
 		sed -i.bak "s|\$${REDIS_PASSWORD}|$$REDISPASS|g" .env; \
+		sed -i.bak "s/^BACKUP_PASSPHRASE=$$/BACKUP_PASSPHRASE=$$BACKUPPASS/" .env; \
 		rm -f .env.bak; \
-		echo "→ SECRET_KEY, JWT_SECRET_KEY, POSTGRES_PASSWORD, REDIS_PASSWORD and GRAFANA_PASSWORD generated"; \
+		echo "→ SECRET_KEY, JWT_SECRET_KEY, POSTGRES_PASSWORD, REDIS_PASSWORD, GRAFANA_PASSWORD and BACKUP_PASSPHRASE generated"; \
+		echo ""; \
+		echo "  ⚠ BACKUP_PASSPHRASE encrypts your nightly backups and exists only in .env."; \
+		echo "    Keep a copy of .env off this machine, or a restore will not be possible."; \
 		echo ""; \
 		echo "  Edit .env and set:"; \
 		echo "    LLM_PROVIDER + LLM_API_KEY  (or set LLM_PROVIDER=ollama for local LLM)"; \
@@ -240,15 +247,31 @@ pilot-create-client:
 
 # ── Backup ─────────────────────────────────────────────────────────────────────
 
+# Chiffre comme la boucle nocturne, et pour la meme raison : une archive
+# manuelle ecrite en clair sur le volume y laisse des blocs lisibles meme
+# apres suppression. Le code de pg_dump est lu via un fichier parce que le
+# tube vers openssl rendrait celui d'openssl, qui reussit sur n'importe quoi.
 backup-now:
 	@echo "→ Lancement d'un backup manuel..."
 	docker compose exec backup sh -c \
-		'DEST=/backups/vibops_$$(date -u +%Y-%m-%dT%H%M%S)_manual.sql.gz; \
-		 pg_dump -h postgres -U vibops -d vibops_db | gzip > $$DEST && echo "✓ $$DEST"'
+		'if [ -n "$$BACKUP_PASSPHRASE" ]; then SUF=.enc; else SUF=; fi; \
+		 DEST=/backups/vibops_$$(date -u +%Y-%m-%dT%H%M%S)_manual.sql.gz$$SUF; \
+		 rm -f /work/pg; \
+		 { set +e; pg_dump -h postgres -U vibops -d vibops_db -Z 6; echo $$? > /work/pg; } \
+		   | { if [ -n "$$SUF" ]; then openssl enc -aes-256-cbc -pbkdf2 \
+		         -iter "$${BACKUP_ITER:-600000}" -salt -pass env:BACKUP_PASSPHRASE -out $$DEST; \
+		       else cat > $$DEST; fi; }; \
+		 [ "$$(cat /work/pg 2>/dev/null)" = 0 ] || { rm -f $$DEST; echo "✗ pg_dump a echoue"; exit 1; }; \
+		 echo "✓ $$DEST"'
 
 backup-list:
 	@echo "Backups disponibles :"
-	docker compose exec backup sh -c 'ls -lh /backups/vibops_*.sql.gz 2>/dev/null || echo "(aucun backup)"'
+	docker compose exec backup sh -c 'ls -lh /backups/vibops_*.sql.gz /backups/vibops_*.sql.gz.enc 2>/dev/null || echo "(aucun backup)"'
+	@echo ""
+	@echo "Les archives en .enc sont chiffrees : la clef est BACKUP_PASSPHRASE dans .env."
+	@echo "Pour en ouvrir une :"
+	@echo "  docker compose exec backup sh -c 'openssl enc -d -aes-256-cbc -pbkdf2 \\"
+	@echo "    -iter 600000 -pass env:BACKUP_PASSPHRASE -in /backups/<fichier>.enc | gzip -dc | head'" 
 
 # ── Release ────────────────────────────────────────────────────────────────────
 
@@ -256,6 +279,35 @@ publish:
 	@bash scripts/publish-install-repo.sh $(VERSION)
 
 # ── Help ───────────────────────────────────────────────────────────────────────
+
+# ── Licences (depot produit uniquement) ───────────────────────────────────────
+#
+# Ce Makefile est publie : `scripts/publish-install-repo.sh` l'envoie au depot
+# que clone le client. `scripts/gen_licence.py`, lui, n'y part pas — emettre une
+# licence est un acte vendeur. Une cible inconditionnelle apparaitrait donc dans
+# le `make help` de chaque client et echouerait sur un fichier absent.
+ifneq ($(wildcard scripts/gen_licence.py),)
+.PHONY: licence
+
+LICENCE_KEY_PATH ?= $(HOME)/.vibops/licence-signing-key.pem
+
+licence:
+	@test -n "$(CUSTOMER)" || { echo "✗ CUSTOMER= requis — le nom affiche dans la console du client"; exit 1; }
+	@test -n "$(PLAN)"     || { echo "✗ PLAN= requis — trial, starter, pro ou enterprise"; exit 1; }
+	@test -n "$(DAYS)"     || { echo "✗ DAYS= requis — une cle emise ne se revoque pas, datez court"; exit 1; }
+	@test -f "$(LICENCE_KEY_PATH)" || { \
+		echo "✗ Cle de signature introuvable : $(LICENCE_KEY_PATH)"; \
+		echo "  Elle est dans votre gestionnaire de mots de passe — restaurez-la ici en 0600,"; \
+		echo "  ou donnez son chemin : make licence LICENCE_KEY_PATH=/chemin/cle.pem …"; \
+		exit 1; }
+	@VIBOPS_LICENCE_PRIVATE_KEY="$(LICENCE_KEY_PATH)" \
+		$(if $(wildcard core/.venv/bin/python),core/.venv/bin/python,python3) \
+		scripts/gen_licence.py --customer "$(CUSTOMER)" --plan "$(PLAN)" --days "$(DAYS)" \
+		$(if $(GPU_MAX),--gpu-max $(GPU_MAX)) \
+		$(if $(USERS_MAX),--users-max $(USERS_MAX)) \
+		$(if $(CLUSTERS_MAX),--clusters-max $(CLUSTERS_MAX))
+endif
+
 
 help:
 	@echo ""
@@ -266,7 +318,7 @@ help:
 	@echo "  make down                                  Stop the stack"
 	@echo "  make check                                 Health check (all services)"
 	@echo "  make logs SERVICE=core                     Tail logs for a service"
-	@echo "  make hash PASSWORD=yourpassword            Generate bcrypt password hash"
+	@echo "  make hash PASSWORD=yourpassword            Generate scrypt password hash"
 	@echo ""
 	@echo "  make pilot-create-client \\"
 	@echo "    ORG=acme EMAIL=admin@acme.com \\"
@@ -276,4 +328,9 @@ help:
 	@echo "  make backup-list                           List available backups"
 	@echo ""
 	@echo "  make publish VERSION=v0.15.1               Publish to public install repo"
+ifneq ($(wildcard scripts/gen_licence.py),)
+	@echo ""
+	@echo "  make licence \\"
+	@echo "    CUSTOMER=\"Oreus\" PLAN=pro DAYS=365        Emit a licence key (vendor)"
+endif
 	@echo ""

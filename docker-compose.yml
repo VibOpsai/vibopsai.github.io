@@ -48,7 +48,7 @@ services:
   # ─── Core API ─────────────────────────────────────────────────────────────
 
   core:
-    image: ghcr.io/davidmacamara-boop/vibops-core@sha256:d0ae4af4d88ed29372f49dd519439807f46b8bdd60295273fe88473dbddeb751
+    image: ghcr.io/davidmacamara-boop/vibops-core@sha256:1d7cca9ce28e9258597229862b5a5f61dfbd5d853fd8af8032242675b786a9dc
     container_name: vibops_core
     restart: unless-stopped
     command: ["api"]
@@ -110,7 +110,7 @@ services:
   # ─── Worker + Beat ────────────────────────────────────────────────────────
 
   worker:
-    image: ghcr.io/davidmacamara-boop/vibops-worker@sha256:ca77d00e94dd806c0e0075d9ae8310827052c293bd00139da35e4da81e09e988
+    image: ghcr.io/davidmacamara-boop/vibops-worker@sha256:e130838ac53012b58d0ea789277626a334fac0eb805e8a0375bc30df85e87d0f
     container_name: vibops_worker
     restart: unless-stopped
     command: ["worker"]
@@ -151,7 +151,7 @@ services:
       - vibops_net
 
   beat:
-    image: ghcr.io/davidmacamara-boop/vibops-core@sha256:d0ae4af4d88ed29372f49dd519439807f46b8bdd60295273fe88473dbddeb751
+    image: ghcr.io/davidmacamara-boop/vibops-core@sha256:1d7cca9ce28e9258597229862b5a5f61dfbd5d853fd8af8032242675b786a9dc
     container_name: vibops_beat
     restart: unless-stopped
     command: ["beat"]
@@ -193,13 +193,57 @@ services:
   # ─── Backup ───────────────────────────────────────────────────────────────
 
   backup:
-    image: postgres:16-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea
+    # `postgres:16`, Debian — et non `16-alpine` comme le serveur ci-dessus.
+    #
+    # C'est la seule image qui porte `pg_dump` ET `openssl`, et il les faut
+    # dans le meme processus : avec deux conteneurs, l'archive en clair devrait
+    # etre ecrite sur le volume puis deliee, et un fichier delie n'est pas un
+    # fichier efface — ses blocs restent lisibles sur le peripherique jusqu'a
+    # reecriture. Le disque vole est precisement la menace que le chiffrement
+    # adresse. Mesure le 03/10/2026 : `postgres:16-alpine` n'a ni openssl, ni
+    # gpg, ni age ; `alpine` non plus ; et notre image core a openssl mais pas
+    # `pg_dump`.
+    #
+    # Le SERVEUR reste sur alpine. Debian est en glibc, Alpine en musl, et
+    # changer de libc sous un repertoire de donnees existant peut changer
+    # l'ordre de collation et fausser les index. Ce conteneur-ci ne touche pas
+    # au repertoire de donnees, il ne parle que le protocole reseau.
+    image: postgres:16@sha256:1a6ab3f5345eb6dbe04a1349529caabdb0ab09293a09590fad07b2246bfa4b54
     container_name: vibops_backup
     restart: unless-stopped
     environment:
       PGPASSWORD: ${POSTGRES_PASSWORD}
+      # PGHOST et PGUSER ne servent pas a la boucle ci-dessous, qui passe ses
+      # `-h` et `-U` explicitement. Ils servent a la RESTAURATION : avec eux,
+      # `psql -d postgres` fonctionne dans ce conteneur, donc la procedure du
+      # runbook est le meme texte ici et sur Helm.
+      #
+      # Sans eux, les commandes du runbook echouaient sur « connection to
+      # server on socket /var/run/postgresql/.s.PGSQL.5432 failed: No such
+      # file or directory » — il n'y a pas de serveur local dans ce conteneur.
+      # Trouve le 03/10/2026 en deroulant la procedure a la lettre.
+      PGHOST: postgres
+      PGUSER: vibops
+      # Vide = archives en clair. Renseignee = archives chiffrees en
+      # AES-256-CBC, suffixe `.enc`. `make quickstart` et `install.sh` en
+      # generent une pour toute installation neuve ; une installation
+      # existante qui met a jour n'en a pas, donc rien ne change pour elle
+      # jusqu'a ce qu'elle en pose une.
+      #
+      # ⚠ CETTE CLEF EST LA SEULE. Perdue, les trente jours d'archives — et
+      # toutes les copies hors machine — ne s'ouvrent plus. Elle est dans .env :
+      # sauvegardez .env ailleurs que sur cette machine.
+      BACKUP_PASSPHRASE: ${BACKUP_PASSPHRASE:-}
+      BACKUP_ITER: ${BACKUP_ITER:-600000}
     volumes:
       - backups:/backups
+      # En memoire, jamais sur un disque : le code de retour de pg_dump que le
+      # tube efface, et les globals en clair — quelques kilooctets de roles,
+      # quelle que soit la taille de la base.
+      - type: tmpfs
+        target: /work
+        tmpfs:
+          size: 16m
     # L'attente du schema avant le premier dump n'est pas une precaution : sans
     # elle, la premiere sauvegarde de toute installation neuve est vide.
     #
@@ -215,6 +259,32 @@ services:
     # Et il se presentait comme une sauvegarde : `make backup-list` l'affichait,
     # et le healthcheck ci-dessous le validait. Le premier jour d'un pilote est
     # celui ou l'on casse le plus de choses, et c'etait le jour sans filet.
+    #
+    # Deux defauts de la meme famille, corriges le 03/10/2026 en portant la
+    # sauvegarde au chart Helm.
+    #
+    # `pg_dump | gzip` rend le code de gzip, qui reussit sur n'importe quoi. Un
+    # pg_dump mort a mi-course laissait donc une archive bien formee et un code
+    # de retour nul, et `set -o pipefail` n'existe pas dans le sh de cette
+    # image.
+    #
+    # Il y a desormais un tube — vers `openssl`, qui reussit tout autant — donc
+    # le code de `pg_dump` est ecrit dans un fichier et relu juste apres. Avec
+    # `set +e` dans le groupe, sans quoi l'errexit herite tue le groupe avant
+    # la ligne qui ecrit le code, et avec le fichier efface d'abord, sans quoi
+    # un code laisse par la commande precedente se ferait passer pour celui de
+    # celle-ci. Les deux pieges ont ete rencontres le 03/10/2026 en portant la
+    # meme logique au chart Helm.
+    #
+    # Les globals, eux, passent par `-f` : pas de tube, donc le code est
+    # directement le leur.
+    #
+    # Et la retention tournait quoi qu'il arrive. Un dump qui echoue chaque nuit
+    # avec une retention qui fonctionne, c'est un volume qui se vide : au
+    # trente-et-unieme jour il ne reste rien, et chaque etape a fait exactement
+    # ce qu'on lui avait demande. La retention ne s'execute donc plus qu'apres
+    # une archive verifiee, et l'archive du jour est supprimee si elle ne l'est
+    # pas — pour que le healthcheck le voie.
     entrypoint: >
       sh -c '
         until [ "$$(psql -h postgres -U vibops -d vibops_db -tAc "select count(*) from alembic_version" 2>/dev/null)" = "1" ]; do
@@ -222,12 +292,28 @@ services:
           sleep 10;
         done;
         echo "backup: schema present, premiere sauvegarde";
+        if [ -n "$$BACKUP_PASSPHRASE" ]; then SUF=.enc; else SUF=; fi;
+        seal() { if [ -n "$$SUF" ]; then openssl enc -aes-256-cbc -pbkdf2 -iter "$$BACKUP_ITER" -salt -pass env:BACKUP_PASSPHRASE -out "$$1"; else cat > "$$1"; fi; };
+        read_back() { if [ -n "$$SUF" ]; then openssl enc -d -aes-256-cbc -pbkdf2 -iter "$$BACKUP_ITER" -pass env:BACKUP_PASSPHRASE -in "$$1"; else cat "$$1"; fi | gzip -dc; };
         while true; do
           STAMP=$$(date -u +%Y-%m-%d);
-          pg_dump -h postgres -U vibops -d vibops_db | gzip > /backups/vibops_$${STAMP}.sql.gz;
-          pg_dumpall -h postgres -U vibops --globals-only --no-role-passwords | gzip > /backups/globals_$${STAMP}.sql.gz;
-          find /backups -name "vibops_*.sql.gz" -mtime +30 -delete;
-          find /backups -name "globals_*.sql.gz" -mtime +30 -delete;
+          DUMP=/backups/vibops_$${STAMP}.sql.gz$${SUF};
+          GLOB=/backups/globals_$${STAMP}.sql.gz$${SUF};
+          rm -f /work/pg;
+          { set +e; pg_dump -h postgres -U vibops -d vibops_db -Z 6; echo $$? > /work/pg; } | seal "$$DUMP";
+          if [ "$$(cat /work/pg 2>/dev/null)" = 0 ] &&
+             pg_dumpall -h postgres -U vibops --globals-only --no-role-passwords -f /work/globals.sql &&
+             gzip -f /work/globals.sql &&
+             seal "$$GLOB" < /work/globals.sql.gz &&
+             read_back "$$DUMP" | grep -qm1 "CREATE TABLE"; then
+            find /backups -name "vibops_*.sql.gz*" -mtime +30 -delete;
+            find /backups -name "globals_*.sql.gz*" -mtime +30 -delete;
+            echo "backup: $$(ls -l $$DUMP)";
+          else
+            echo "backup: dump echoue — retention suspendue, rien supprime" >&2;
+            rm -f "$$DUMP" "$$GLOB";
+          fi;
+          rm -f /work/globals.sql.gz;
           sleep 86400;
         done
       '
@@ -251,7 +337,29 @@ services:
       # 643 octets ne contenant aucune table. Il exige donc maintenant que le
       # dump recent porte un CREATE TABLE — c'est la difference entre « un
       # fichier existe » et « une sauvegarde existe ».
-      test: ["CMD-SHELL", "D=$$(find /backups -name 'vibops_*.sql.gz' -mtime -2 | sort | tail -1); [ -n \"$$D\" ] && zcat \"$$D\" | grep -qm1 'CREATE TABLE' && find /backups -name 'globals_*.sql.gz' -mtime -2 | grep -q . || exit 1"]
+      #
+      # Et il dechiffre pour regarder dedans. Un controle qui s'arreterait a la
+      # presence du fichier serait exactement celui que le dump de 643 octets
+      # passait ; un controle qui verifierait le chiffre sans l'ouvrir dirait
+      # « il y a un fichier chiffre » et non « il y a une sauvegarde ». La clef
+      # est dans l'environnement de ce conteneur, qui est aussi celui qui a
+      # ecrit l'archive : la relire ici ne l'expose pas davantage.
+      # Toutes les lignes a la MEME indentation, et l'appel a openssl sur une
+      # seule. Un scalaire replie YAML ne replie que les lignes de meme
+      # indentation : une ligne plus indentee garde son retour a la ligne. La
+      # continuation `-pass env:…` devenait donc une commande a part, openssl
+      # reclamait la clef au clavier, et le healthcheck echouait sur
+      # « sh: -pass: not found ». Vu seulement en l'executant — `docker compose
+      # config` rendait un YAML parfaitement valide. 03/10/2026.
+      test:
+        - CMD-SHELL
+        - >
+          D=$$(find /backups -name 'vibops_*.sql.gz*' -mtime -2 | sort | tail -1);
+          [ -n "$$D" ] || exit 1;
+          if [ "$${D%.enc}" != "$$D" ]; then
+          openssl enc -d -aes-256-cbc -pbkdf2 -iter "$${BACKUP_ITER:-600000}" -pass env:BACKUP_PASSPHRASE -in "$$D";
+          else cat "$$D"; fi | gzip -dc | grep -qm1 'CREATE TABLE' || exit 1;
+          find /backups -name 'globals_*.sql.gz*' -mtime -2 | grep -q .
       interval: 5m
       timeout: 10s
       retries: 3
@@ -259,10 +367,111 @@ services:
     networks:
       - vibops_net
 
+  # La copie hors machine, que l'ADR 0048 nomme son plus gros trou.
+  #
+  # Le service `backup` ci-dessus ecrit dans un volume de cette machine. Une
+  # perte d'hote — le disque, la VM, la region — emporte la base et toutes ses
+  # sauvegardes ensemble. Ce service est ce qui ferme cela.
+  #
+  # Il ne demarre pas avec le reste : `profiles` le laisse de cote jusqu'a
+  #
+  #     docker compose --profile offsite up -d
+  #
+  # parce que la destination appartient a l'exploitant et qu'aucun defaut ne
+  # peut l'inventer. Trois variables dans .env suffisent, plus celles que
+  # rclone attend pour le type de destination choisi :
+  #
+  #     BACKUP_REMOTE_PATH=mon-bucket/vibops/prod
+  #     RCLONE_CONFIG_OFFSITE_TYPE=s3
+  #     RCLONE_CONFIG_OFFSITE_PROVIDER=Other
+  #     RCLONE_CONFIG_OFFSITE_ENDPOINT=https://s3.gra.io.cloud.ovh.net
+  #     RCLONE_CONFIG_OFFSITE_ACCESS_KEY_ID=…
+  #     RCLONE_CONFIG_OFFSITE_SECRET_ACCESS_KEY=…
+  #
+  # Aucun fournisseur n'est modelise : rclone lit une destination nommee
+  # `offsite` dans ces variables, donc S3 sur n'importe quel nuage, SFTP vers
+  # une autre machine, Azure Blob ou tout ce que rclone sait faire fonctionne
+  # sans toucher a ce fichier. docs/installation.md donne les cles par cible.
+  backup-offsite:
+    image: rclone/rclone:1.75.1@sha256:45401ad7410db1d67ffdb58e19059ad20b0d8e0285a60e38bbec55cc1019c7a5
+    container_name: vibops_backup_offsite
+    restart: unless-stopped
+    profiles: ["offsite"]
+    env_file: .env
+    environment:
+      REMOTE_PATH: ${BACKUP_REMOTE_PATH:-}
+      RETENTION_DAYS: ${BACKUP_REMOTE_RETENTION_DAYS:-30}
+      # rclone ecrit sa configuration et son cache ici.
+      RCLONE_CONFIG: /tmp/rclone.conf
+      HOME: /tmp
+    volumes:
+      # En lecture seule : ce service transporte, il ne produit rien.
+      - backups:/backups:ro
+    # Une heure, pas vingt-quatre.
+    #
+    # Le service `backup` dort 24 h entre deux dumps ; calquer ce rythme ici
+    # ferait qu'une destination indisponible a l'instant du transfert attendrait
+    # le lendemain. `rclone copy --checksum` ne transfere rien quand l'objet est
+    # deja la et identique, donc repasser chaque heure ne coute rien et rattrape
+    # une panne de la destination dans l'heure.
+    entrypoint: >
+      sh -c '
+        if [ -z "$$REMOTE_PATH" ]; then
+          echo "offsite: BACKUP_REMOTE_PATH vide — rien a faire, et ce profil ne devrait pas tourner" >&2;
+          exit 1;
+        fi;
+        while true; do
+          STAMP=$$(date -u +%Y-%m-%d);
+          DUMP=; GLOB=;
+          for n in "vibops_$${STAMP}.sql.gz.enc" "vibops_$${STAMP}.sql.gz"; do
+            [ -s "/backups/$$n" ] && DUMP="$$n" && break;
+          done;
+          for n in "globals_$${STAMP}.sql.gz.enc" "globals_$${STAMP}.sql.gz"; do
+            [ -s "/backups/$$n" ] && GLOB="$$n" && break;
+          done;
+          if [ -n "$$DUMP" ] && [ -n "$$GLOB" ]; then
+            rclone copy --checksum --no-traverse "/backups/$$DUMP" "offsite:$$REMOTE_PATH/" &&
+            rclone copy --checksum --no-traverse "/backups/$$GLOB" "offsite:$$REMOTE_PATH/" &&
+            rclone check --one-way --include "$$DUMP" --include "$$GLOB" /backups "offsite:$$REMOTE_PATH" &&
+            rclone delete --min-age "$${RETENTION_DAYS}d" --include "vibops_*.sql.gz*" --include "globals_*.sql.gz*" "offsite:$$REMOTE_PATH" &&
+            echo "offsite: $$REMOTE_PATH <- $$DUMP $$GLOB" ||
+            echo "offsite: transfert echoue, nouvelle tentative dans une heure" >&2;
+          else
+            echo "offsite: pas encore de sauvegarde du jour dans /backups";
+          fi;
+          sleep 3600;
+        done
+      '
+    # « Pret » pour ce service, c'est que la destination porte une copie
+    # recente — pas que le conteneur tourne.
+    #
+    # Le test interroge la destination, pas un marqueur local : c'est la seule
+    # question qui compte, et c'est celle qu'un transfert casse en silence rend
+    # invisible. Des identifiants revoques, un bucket renomme, une facture
+    # impayee laissent le processus vivant et la boucle journaliser son echec
+    # dans un flux que personne ne lit.
+    #
+    # Deux jours de tolerance, comme le healthcheck du service `backup`.
+    healthcheck:
+      # En forme de bloc : la forme en ligne demandait des guillemets
+      # imbriques sur trois niveaux et cassait l'analyse YAML du fichier
+      # entier — `docker compose config` ne rendait plus rien du tout.
+      test:
+        - CMD-SHELL
+        - >
+          rclone lsjson --max-age 2d --include 'vibops_*.sql.gz*'
+          "offsite:$$REMOTE_PATH" 2>/dev/null | grep -q Name
+      interval: 15m
+      timeout: 60s
+      retries: 3
+      start_period: 5m
+    networks:
+      - vibops_net
+
   # ─── Agent ────────────────────────────────────────────────────────────────
 
   agent:
-    image: ghcr.io/davidmacamara-boop/vibops-agent@sha256:69981850142f03571ec2f6af95ee9287c094d1b13688ecc1becbb83fd61d420c
+    image: ghcr.io/davidmacamara-boop/vibops-agent@sha256:9dc9fa04b107db517e23779de0c85c33a817433bb2f5e10a677d65814b123d56
     container_name: vibops_agent
     restart: unless-stopped
     env_file: .env
@@ -292,7 +501,7 @@ services:
   # ─── Console ──────────────────────────────────────────────────────────────
 
   console:
-    image: ghcr.io/davidmacamara-boop/vibops-console@sha256:e61b82805889593c7b154c9348b523700132315c4bbd16719192aa2ba375b419
+    image: ghcr.io/davidmacamara-boop/vibops-console@sha256:4230575654db9d13c34a52f2fdf934c0b137690f936dbcb111b5855b0f9c95b0
     container_name: vibops_console
     restart: unless-stopped
     env_file: .env
@@ -335,7 +544,7 @@ services:
   #
   # Sous profil, donc inerte tant qu'on ne demande pas `--profile connect`.
   connect:
-    image: ghcr.io/davidmacamara-boop/vibops-connect@sha256:5afe83ef2cff38b1a9fcfb2344aa9f8d5e0332ae2f39d0d9f76b2635104455c1
+    image: ghcr.io/davidmacamara-boop/vibops-connect@sha256:98e8f44be1f2c09a72e89d55e6f287adf86a1f3ba5055f94cfc1e79eb202ed3a
     container_name: vibops_connect
     restart: unless-stopped
     profiles: ["connect"]
@@ -370,7 +579,7 @@ services:
       - vibops_net
 
   llm-proxy:
-    image: ghcr.io/davidmacamara-boop/vibops-llm-proxy@sha256:75e2619b7f4bafabbc291e5be0add05350deb58a54a7a9e9f4eac71b99c33e67
+    image: ghcr.io/davidmacamara-boop/vibops-llm-proxy@sha256:cbd0627dacdf373a5045c2e9afe24f4f553aecf578822241102fc4c0603f75a4
     container_name: vibops_llm_proxy
     restart: unless-stopped
     # Boucle locale, et c'est tout ce qu'on peut faire par defaut.

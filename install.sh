@@ -20,7 +20,7 @@ set -euo pipefail
 # ─────────────────────────────────────────────────────────────────────────────
 
 VIBOPS_DIR="/opt/vibops"
-VIBOPS_VERSION="${VIBOPS_VERSION:-v0.51.3}"
+VIBOPS_VERSION="${VIBOPS_VERSION:-v0.52.0}"
 LLM_API_KEY="${LLM_API_KEY:-}"
 LLM_MODEL="${LLM_MODEL:-claude-sonnet-5}"
 LLM_PROVIDER="${LLM_PROVIDER:-claude}"
@@ -294,6 +294,10 @@ if [[ ! -f .env ]]; then
     || openssl rand -base64 32)
   INTERNAL_API_KEY=$(openssl rand -hex 32)
   GRAFANA_PASSWORD=$(openssl rand -base64 16)
+  # Chiffre les archives de sauvegarde. Elle n'existe que dans ce .env : le
+  # recapitulatif de fin le dit, parce qu'une clef perdue rend trente jours
+  # d'archives — et toutes les copies hors machine — inouvrables.
+  BACKUP_PASSPHRASE=$(openssl rand -hex 32)
 
   if [[ -z "$ADMIN_PASSWORD" ]]; then
     ADMIN_PASSWORD=$(openssl rand -base64 12)
@@ -325,6 +329,15 @@ DATABASE_URL=postgresql+asyncpg://vibops:${POSTGRES_PASSWORD}@postgres:5432/vibo
 
 # ─── Redis ──────────────────────────────────────────────────
 REDIS_PASSWORD=${REDIS_PASSWORD}
+
+# ─── Backups ────────────────────────────────────────────────
+# Chiffre les archives nocturnes (AES-256-CBC).
+#
+# ⚠ CETTE CLEF EST LA SEULE. Perdue, les trente jours d'archives et toutes
+# leurs copies hors machine ne s'ouvrent plus. Gardez une copie de ce fichier
+# ailleurs que sur cette machine.
+BACKUP_PASSPHRASE=${BACKUP_PASSPHRASE}
+BACKUP_ITER=600000
 
 # ─── Security ───────────────────────────────────────────────
 SECRET_KEY=${SECRET_KEY}
@@ -473,6 +486,18 @@ echo "║  Logs:       docker compose -f ${VIBOPS_DIR}/docker-compose.yml logs -
 echo "║                                                      ║"
 echo "╚══════════════════════════════════════════════════════╝"
 echo ""
+
+# La clef de sauvegarde n'existe que dans ce .env. Le dire ici, au moment ou
+# elle vient d'etre creee, est le seul instant ou l'exploitant est en train de
+# regarder : une clef perdue rend trente jours d'archives — et toutes leurs
+# copies hors machine — inouvrables, et rien ne le signalera avant le jour de
+# la restauration.
+if grep -q '^BACKUP_PASSPHRASE=.' "${VIBOPS_DIR}/.env" 2>/dev/null; then
+  warn "Vos sauvegardes sont chiffrees, et la clef est dans ${VIBOPS_DIR}/.env uniquement."
+  warn "  Copiez ce fichier ailleurs que sur cette machine des maintenant."
+  echo "  grep BACKUP_PASSPHRASE ${VIBOPS_DIR}/.env"
+  echo ""
+fi
 
 if [[ -z "$LLM_API_KEY" ]]; then
   # « ne fonctionnera pas » etait trop doux : le script pose APP_ENV=production,
