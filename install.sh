@@ -20,7 +20,7 @@ set -euo pipefail
 # ─────────────────────────────────────────────────────────────────────────────
 
 VIBOPS_DIR="/opt/vibops"
-VIBOPS_VERSION="${VIBOPS_VERSION:-v0.53.3}"
+VIBOPS_VERSION="${VIBOPS_VERSION:-v0.54.0}"
 LLM_API_KEY="${LLM_API_KEY:-}"
 LLM_MODEL="${LLM_MODEL:-claude-sonnet-5}"
 LLM_PROVIDER="${LLM_PROVIDER:-claude}"
@@ -288,6 +288,10 @@ fi
 if [[ ! -f .env ]]; then
   POSTGRES_PASSWORD=$(openssl rand -hex 24)
   REDIS_PASSWORD=$(openssl rand -hex 24)
+  # Le mot de passe du role `vibops_app`, celui sous lequel les politiques de
+  # l'ADR 0047 mordent reellement. Sans lui, core se connecte en
+  # superutilisateur et la base n'isole aucun locataire — voir le compose.
+  APP_ROLE_PASSWORD=$(openssl rand -hex 24)
   SECRET_KEY=$(openssl rand -hex 32)
   JWT_SECRET_KEY=$(openssl rand -base64 32)
   VAULT_KEY=$(python3 -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())" 2>/dev/null \
@@ -326,6 +330,12 @@ VIBOPS_VERSION=${VIBOPS_VERSION}
 # ─── Database ───────────────────────────────────────────────
 POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
 DATABASE_URL=postgresql+asyncpg://vibops:${POSTGRES_PASSWORD}@postgres:5432/vibops_db
+
+# ─── Isolation des locataires par la base (ADR 0047) ────────
+# Le role applicatif, sans superutilisateur ni BYPASSRLS. Videz cette variable
+# pour remettre l'application sur le proprietaire : la base cesse alors
+# d'isoler les locataires, et l'entrypoint le dit dans ses journaux.
+APP_ROLE_PASSWORD=${APP_ROLE_PASSWORD}
 
 # ─── Redis ──────────────────────────────────────────────────
 REDIS_PASSWORD=${REDIS_PASSWORD}

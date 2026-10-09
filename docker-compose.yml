@@ -48,13 +48,26 @@ services:
   # ─── Core API ─────────────────────────────────────────────────────────────
 
   core:
-    image: ghcr.io/davidmacamara-boop/vibops-core@sha256:8bd6cfc5cc2583390cd88c31f9076101741e527e5cb5305def9a04be52a9579c
+    image: ghcr.io/davidmacamara-boop/vibops-core@sha256:ecc80df07bd3368e2bbc914dc2b3a57d1e39c93a42541160d237d0678a9bdcf7
     container_name: vibops_core
     restart: unless-stopped
     command: ["api"]
     env_file: .env
     environment:
       DATABASE_URL: postgresql+asyncpg://vibops:${POSTGRES_PASSWORD}@postgres:5432/vibops_db
+      # Le role que l'APPLICATION connecte, quand un mot de passe lui est donne.
+      # `DATABASE_URL` ci-dessus reste la connexion proprietaire : les migrations
+      # la gardent, car le DDL demande des privileges que `vibops_app` n'a pas.
+      #
+      # Sans ce role, core se connecte en superutilisateur et les 47 politiques
+      # de l'ADR 0047 n'appliquent RIEN — meme la portee que l'application pose
+      # sur chaque transaction est sans effet. Mesure : la meme requete rend six
+      # lignes sur deux locataires la ou le role contraint en rend zero.
+      #
+      # APP_ROLE_PASSWORD vide = repli sur le proprietaire, et l'entrypoint le dit
+      # dans ses journaux. C'est l'equivalent du `appRole.enabled: false` du chart.
+      APP_ROLE_PASSWORD: ${APP_ROLE_PASSWORD:-}
+      VIBOPS_APP_ROLE_URL: postgresql+asyncpg://vibops_app:${APP_ROLE_PASSWORD:-}@postgres:5432/vibops_db
       REDIS_URL: redis://:${REDIS_PASSWORD:?REDIS_PASSWORD is required — generate one with `openssl rand -hex 24`}@redis:6379/0
     depends_on:
       postgres:
@@ -110,13 +123,26 @@ services:
   # ─── Worker + Beat ────────────────────────────────────────────────────────
 
   worker:
-    image: ghcr.io/davidmacamara-boop/vibops-worker@sha256:d8d77feaf6ce34648cd02829473d3518268a2f719ee89703f2d6ee5dc3cb1301
+    image: ghcr.io/davidmacamara-boop/vibops-worker@sha256:9b98546aadc4240c19db5f55bd7d23cfa7a76d1df833adfad59552e8ea789da7
     container_name: vibops_worker
     restart: unless-stopped
     command: ["worker"]
     env_file: .env
     environment:
       DATABASE_URL: postgresql+asyncpg://vibops:${POSTGRES_PASSWORD}@postgres:5432/vibops_db
+      # Le role que l'APPLICATION connecte, quand un mot de passe lui est donne.
+      # `DATABASE_URL` ci-dessus reste la connexion proprietaire : les migrations
+      # la gardent, car le DDL demande des privileges que `vibops_app` n'a pas.
+      #
+      # Sans ce role, core se connecte en superutilisateur et les 47 politiques
+      # de l'ADR 0047 n'appliquent RIEN — meme la portee que l'application pose
+      # sur chaque transaction est sans effet. Mesure : la meme requete rend six
+      # lignes sur deux locataires la ou le role contraint en rend zero.
+      #
+      # APP_ROLE_PASSWORD vide = repli sur le proprietaire, et l'entrypoint le dit
+      # dans ses journaux. C'est l'equivalent du `appRole.enabled: false` du chart.
+      APP_ROLE_PASSWORD: ${APP_ROLE_PASSWORD:-}
+      VIBOPS_APP_ROLE_URL: postgresql+asyncpg://vibops_app:${APP_ROLE_PASSWORD:-}@postgres:5432/vibops_db
       REDIS_URL: redis://:${REDIS_PASSWORD:?REDIS_PASSWORD is required — generate one with `openssl rand -hex 24`}@redis:6379/0
       DOCKER_HOST: tcp://docker-proxy:2375
       # Le worker s'enregistre lui-meme comme passerelle. Sans ces deux lignes
@@ -151,13 +177,26 @@ services:
       - vibops_net
 
   beat:
-    image: ghcr.io/davidmacamara-boop/vibops-core@sha256:8bd6cfc5cc2583390cd88c31f9076101741e527e5cb5305def9a04be52a9579c
+    image: ghcr.io/davidmacamara-boop/vibops-core@sha256:ecc80df07bd3368e2bbc914dc2b3a57d1e39c93a42541160d237d0678a9bdcf7
     container_name: vibops_beat
     restart: unless-stopped
     command: ["beat"]
     env_file: .env
     environment:
       DATABASE_URL: postgresql+asyncpg://vibops:${POSTGRES_PASSWORD}@postgres:5432/vibops_db
+      # Le role que l'APPLICATION connecte, quand un mot de passe lui est donne.
+      # `DATABASE_URL` ci-dessus reste la connexion proprietaire : les migrations
+      # la gardent, car le DDL demande des privileges que `vibops_app` n'a pas.
+      #
+      # Sans ce role, core se connecte en superutilisateur et les 47 politiques
+      # de l'ADR 0047 n'appliquent RIEN — meme la portee que l'application pose
+      # sur chaque transaction est sans effet. Mesure : la meme requete rend six
+      # lignes sur deux locataires la ou le role contraint en rend zero.
+      #
+      # APP_ROLE_PASSWORD vide = repli sur le proprietaire, et l'entrypoint le dit
+      # dans ses journaux. C'est l'equivalent du `appRole.enabled: false` du chart.
+      APP_ROLE_PASSWORD: ${APP_ROLE_PASSWORD:-}
+      VIBOPS_APP_ROLE_URL: postgresql+asyncpg://vibops_app:${APP_ROLE_PASSWORD:-}@postgres:5432/vibops_db
       REDIS_URL: redis://:${REDIS_PASSWORD:?REDIS_PASSWORD is required — generate one with `openssl rand -hex 24`}@redis:6379/0
     depends_on:
       - redis
@@ -471,7 +510,7 @@ services:
   # ─── Agent ────────────────────────────────────────────────────────────────
 
   agent:
-    image: ghcr.io/davidmacamara-boop/vibops-agent@sha256:422ea51ee386ca135dfc777da1a26410ebc71486e9b4ed414feb896922d081e1
+    image: ghcr.io/davidmacamara-boop/vibops-agent@sha256:bd298e38bd149e1827d97292abfb3f06637bbe5f0afe0cd4c8d2a1669134c61c
     container_name: vibops_agent
     restart: unless-stopped
     env_file: .env
@@ -501,7 +540,7 @@ services:
   # ─── Console ──────────────────────────────────────────────────────────────
 
   console:
-    image: ghcr.io/davidmacamara-boop/vibops-console@sha256:f499f7f7207fce6172c1c42acd2b3b285117645418a133bc2a70ea4597acd4f9
+    image: ghcr.io/davidmacamara-boop/vibops-console@sha256:8657551af4ea6cab79c94341a1757950eb71a1e540d03b469826b1472f81f05a
     container_name: vibops_console
     restart: unless-stopped
     env_file: .env
@@ -544,7 +583,7 @@ services:
   #
   # Sous profil, donc inerte tant qu'on ne demande pas `--profile connect`.
   connect:
-    image: ghcr.io/davidmacamara-boop/vibops-connect@sha256:1adc1b0eeb0b8d99b0c2817e9a77dcebc681ee0aa93bc0a41b18bad1865d7360
+    image: ghcr.io/davidmacamara-boop/vibops-connect@sha256:f865806d621700f3382640415c27d1245c57f77b845808419fcaa4af7c95bb44
     container_name: vibops_connect
     restart: unless-stopped
     profiles: ["connect"]
@@ -579,7 +618,7 @@ services:
       - vibops_net
 
   llm-proxy:
-    image: ghcr.io/davidmacamara-boop/vibops-llm-proxy@sha256:2237bb3af7834f3d54842373cb1cc6b17c899c3100726d4bb9493141828ba6ba
+    image: ghcr.io/davidmacamara-boop/vibops-llm-proxy@sha256:71808fc966be8833280574abb59f69ee86c6434593c5c3fdd427c5e902fcf7f9
     container_name: vibops_llm_proxy
     restart: unless-stopped
     # Boucle locale, et c'est tout ce qu'on peut faire par defaut.
