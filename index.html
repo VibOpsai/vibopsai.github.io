@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>VibOps — Capacity scales. Operations don't.</title>
-  <meta name="description" content="VibOps is one control plane for GPU and VM operations. Deploy, monitor, govern and bill your applications and agents on any accelerator, any hypervisor, any cloud — driven by the LLM you choose, on-prem, multi-tenant, audit-logged.">
+  <meta name="description" content="From code to GPU in one conversation. VibOps is one control plane for GPU and VM operations. Deploy, monitor, govern and bill your applications and agents on any accelerator, any hypervisor, any cloud — driven by the LLM you choose, on-prem, multi-tenant, audit-logged.">
   <link rel="canonical" href="https://vibops.ai/">
 
   <meta property="og:type" content="website">
@@ -510,10 +510,18 @@
     padding-block: 30px;
     color: var(--haze-dim); font-size: 0.85rem;
   }
-  .foot .shell { display: flex; flex-wrap: wrap; gap: 10px 26px; align-items: center; }
+  .foot .shell {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 14px; text-align: center;
+  }
+  .foot-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 26px; }
   .foot a { color: var(--haze); text-decoration: none; }
   .foot a:hover { color: var(--chalk); }
-  .foot .mono { margin-left: auto; }
+  .foot-mark {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.78rem; color: var(--haze-dim);
+  }
+  .foot-mark b { font-weight: 600; color: var(--haze); }
 
   /* ── Breakpoints: three, not one ───────────────────────────────────────── */
 
@@ -578,10 +586,10 @@
       <div class="eyebrow">GPU · VM · Agents · Sovereign</div>
       <h1>One layer above<br>your <em>toolchain</em>.</h1>
       <p class="prose">
-        Deploy, monitor, govern and bill your applications and your agents —
-        on any GPU, any VM, any cloud — driven by the model you choose, including
-        one that never leaves your network. VibOps abstracts what you already run.
-        It does not ask you to give it up.
+        From code to GPU in one conversation. Deploy, monitor, govern and bill
+        your applications and your agents on any GPU, any VM, any cloud — driven
+        by the model you choose, including one that never leaves your network.
+        VibOps sits above what you already run; it does not ask you to give it up.
       </p>
       <div class="hero-actions">
         <a class="button" href="#access">Request access</a>
@@ -919,12 +927,13 @@
 
 <footer class="foot">
   <div class="shell">
-    <span>VibOps</span>
-    <a class="repo" href="https://github.com/VibOpsai/vibops-mcp">MCP server · MIT</a>
-    <a class="repo" href="https://github.com/VibOpsai/vibops-sdk">Python SDK · MIT</a>
-    <a href="#install">Install</a>
-    <a href="#capabilities">Capabilities</a>
-    <span class="mono">Montréal, Canada</span>
+    <div class="foot-links">
+      <a class="repo" href="https://github.com/VibOpsai/vibops-mcp">MCP server · MIT</a>
+      <a class="repo" href="https://github.com/VibOpsai/vibops-sdk">Python SDK · MIT</a>
+      <a href="#install">Install</a>
+      <a href="#capabilities">Capabilities</a>
+    </div>
+    <p class="foot-mark">© 2026 <b>VibOps</b> · Montréal, Canada</p>
   </div>
 </footer>
 
