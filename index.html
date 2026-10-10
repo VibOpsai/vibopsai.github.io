@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>VibOps — Capacity scales. Operations don't.</title>
-  <meta name="description" content="VibOps is one control plane for GPU and VM operations. Deploy, monitor, govern and bill your applications and agents on any accelerator, any hypervisor, any cloud — on-prem, multi-tenant, audit-logged.">
+  <meta name="description" content="VibOps is one control plane for GPU and VM operations. Deploy, monitor, govern and bill your applications and agents on any accelerator, any hypervisor, any cloud — driven by the LLM you choose, on-prem, multi-tenant, audit-logged.">
   <link rel="canonical" href="https://vibops.ai/">
 
   <meta property="og:type" content="website">
@@ -17,7 +17,7 @@
   <meta name="twitter:description" content="One control plane for GPU and VM operations. The same operations, whatever is underneath.">
   <meta name="twitter:image" content="https://vibops.ai/console.jpg">
 
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%23FFB224'/><text x='16' y='23' text-anchor='middle' font-size='18' font-family='sans-serif' font-weight='700' fill='%2317120A'>V</text></svg>">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%2358a6ff'/><text x='16' y='23' text-anchor='middle' font-size='18' font-family='sans-serif' font-weight='700' fill='%2306121F'>V</text></svg>">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -27,19 +27,23 @@
   /* ─────────────────────────────────────────────────────────────────────────
      An instrument, not a code site.
 
-     The palette leaves GitHub Primer's (#0d1117 / #161b22 / #58a6ff), which
-     the previous page carried verbatim. Cold slate ground, one accent: a dial
-     amber, reserved for live values. Green and red stay semantic — healthy,
-     critical — and decorate nothing.
+     The ground is its own — #0F1319 / #161C25 / #232C3A — rather than GitHub
+     Primer's #0d1117 / #161b22, which the previous page carried verbatim. The
+     accent is #58a6ff, kept from that page: it is the colour the project is
+     recognised by, and an instrument reads in one colour. Green and red stay
+     semantic — healthy, critical — and decorate nothing.
 
      IBM Plex, drawn by IBM for technical interfaces and readouts. Sans for
      prose, Mono for labels, commands, and anything that reads as a measurement.
 
-     Dark by default, because an instrument is read against a dark ground —
-     but the viewer decides. The bare :root holds the dark set; the light set
-     is redefined whole, so no colour is ever defined in only one of the two.
+     One visual world, deliberately: an instrument is read against a dark
+     ground. A light theme forced the accent down to a muddy dark shade to
+     stay legible on white — a colour that is not the brand's. Rather than
+     ship two accents, the page commits to one and paints every surface
+     explicitly, background included, so it holds whatever the host theme is.
      ───────────────────────────────────────────────────────────────────────── */
   :root {
+    color-scheme: dark;
     --slate:        #0F1319;
     --slate-raised: #161C25;
     --slate-well:   #0B0E13;
@@ -48,50 +52,17 @@
     --chalk:        #E9EDF3;
     --haze:         #8B96A5;
     --haze-dim:     #5D6878;
-    --amber:        #FFB224;
-    --amber-fill:   #FFB224;
-    --on-fill:      #17120A;
+    --accent:       #58a6ff;
+    --on-accent:    #06121F;
     --healthy:      #35C27A;
     --critical:     #E5484D;
     --lift:         0 24px 60px -30px rgba(0, 0, 0, .9);
-    --smoothing:    antialiased;
 
     --measure: 1180px;
     --gutter: clamp(20px, 5vw, 56px);
   }
 
-  @media (prefers-color-scheme: light) {
-    :root:not([data-theme="dark"]) {
-      --slate:        #FFFFFF;
-      --slate-raised: #F6F7F9;
-      --slate-well:   #EEF1F5;
-      --rule:         #E3E7ED;
-      --rule-light:   #CBD2DC;
-      --chalk:        #101720;
-      --haze:         #4D5765;
-      --haze-dim:     #68717F;
-      --amber:        #7E4700;
-      --healthy:      #167A46;
-      --critical:     #BC2F34;
-      --lift:         0 18px 40px -24px rgba(16, 24, 40, .28);
-      --smoothing:    auto;
-    }
-  }
-  :root[data-theme="light"] {
-    --slate:        #FFFFFF;
-    --slate-raised: #F6F7F9;
-    --slate-well:   #EEF1F5;
-    --rule:         #E3E7ED;
-    --rule-light:   #CBD2DC;
-    --chalk:        #101720;
-    --haze:         #4D5765;
-    --haze-dim:     #68717F;
-    --amber:        #7E4700;
-    --healthy:      #167A46;
-    --critical:     #BC2F34;
-    --lift:         0 18px 40px -24px rgba(16, 24, 40, .28);
-    --smoothing:    auto;
-  }
+  html { scroll-behavior: smooth; }
 
   *, *::before, *::after { box-sizing: border-box; }
   dl, dd { margin: 0; }
@@ -103,8 +74,10 @@
     font-family: "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
     font-size: 16px;
     line-height: 1.62;
-    -webkit-font-smoothing: var(--smoothing);
+    -webkit-font-smoothing: antialiased;
   }
+
+  section[id] { scroll-margin-top: 86px; }
 
   .shell {
     max-width: var(--measure);
@@ -114,20 +87,24 @@
 
   a { color: inherit; }
   a:focus-visible, button:focus-visible, input:focus-visible {
-    outline: 2px solid var(--amber);
+    outline: 2px solid var(--accent);
     outline-offset: 3px;
   }
   img, video { max-width: 100%; height: auto; display: block; }
 
   /* ── Typographic vocabulary ────────────────────────────────────────────── */
 
+  /* The accent is the page's voice, not a rare highlight: section markers,
+     row headings, measured figures, the live pulse. On this ground #58a6ff
+     reads at roughly 7:1, so using it everywhere costs no legibility — which
+     is exactly what a single dark theme buys. */
   .eyebrow {
     font-family: "IBM Plex Mono", ui-monospace, monospace;
     font-size: 0.7rem;
     font-weight: 500;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: var(--amber);
+    color: var(--accent);
   }
 
   h1, h2, h3 { margin: 0; text-wrap: balance; font-weight: 600; letter-spacing: -0.02em; }
@@ -140,10 +117,10 @@
 
   .prose a, .foot a.repo {
     color: var(--chalk); text-decoration: underline;
-    text-decoration-color: color-mix(in oklab, var(--amber) 60%, transparent);
+    text-decoration-color: color-mix(in oklab, var(--accent) 60%, transparent);
     text-underline-offset: 3px;
   }
-  .prose a:hover, .foot a.repo:hover { color: var(--amber); }
+  .prose a:hover, .foot a.repo:hover { color: var(--accent); }
 
   .mono { font-family: "IBM Plex Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; }
 
@@ -157,14 +134,15 @@
   }
   .topbar .shell {
     display: flex; align-items: center; gap: 28px;
-    min-height: 62px;
+    min-height: 72px;
   }
   .wordmark {
-    font-weight: 700; letter-spacing: -0.03em; font-size: 1.12rem;
+    font-weight: 700; letter-spacing: -0.03em;
+    font-size: clamp(1.35rem, 2.4vw, 1.6rem);
     text-decoration: none; margin-right: auto;
     display: inline-flex; align-items: baseline; gap: 2px;
   }
-  .wordmark span { color: var(--amber); }
+  .wordmark span { color: var(--accent); }
   .topbar nav { display: flex; gap: 24px; }
   .topbar nav a {
     text-decoration: none; color: var(--haze); font-size: 0.92rem;
@@ -174,8 +152,8 @@
 
   .button {
     font: inherit; font-weight: 600; font-size: 0.92rem;
-    border: 1px solid var(--amber-fill);
-    background: var(--amber-fill); color: var(--on-fill);
+    border: 1px solid var(--accent);
+    background: var(--accent); color: var(--on-accent);
     padding: 9px 17px; border-radius: 7px; cursor: pointer;
     text-decoration: none; white-space: nowrap;
     transition: filter .18s, transform .18s;
@@ -195,7 +173,7 @@
     align-items: center;
   }
   .hero h1 { margin-block: 18px 0; }
-  .hero h1 em { font-style: normal; color: var(--amber); }
+  .hero h1 em { font-style: normal; color: var(--accent); }
   .hero .prose { margin-top: 20px; font-size: 1.08rem; }
 
   .hero-actions { margin-top: 28px; display: flex; flex-wrap: wrap; gap: 10px; }
@@ -210,7 +188,7 @@
     border: 1px solid var(--rule); border-radius: 999px;
     padding: 4px 11px; color: var(--haze);
   }
-  .stamp.lead { border-color: color-mix(in oklab, var(--amber) 45%, var(--rule)); color: var(--amber); }
+  .stamp.lead { border-color: color-mix(in oklab, var(--accent) 45%, var(--rule)); color: var(--accent); }
 
   .product-frame {
     border: 1px solid var(--rule); border-radius: 12px;
@@ -249,7 +227,7 @@
     font-family: "IBM Plex Mono", ui-monospace, monospace;
     font-variant-numeric: tabular-nums;
     font-size: 1.75rem; font-weight: 600; line-height: 1;
-    color: var(--amber); margin: 0;
+    color: var(--accent); margin: 0;
   }
   .figures dd { font-size: 0.82rem; line-height: 1.42; color: var(--haze); }
 
@@ -273,24 +251,139 @@
   .ledger-head span {
     font-family: "IBM Plex Mono", ui-monospace, monospace;
     font-size: 0.68rem; letter-spacing: .12em; text-transform: uppercase;
-    color: var(--haze-dim);
+    color: var(--accent);
   }
   .ledger-row .bought { color: var(--chalk); font-weight: 500; }
   .ledger-row .carries { color: var(--haze); }
   .ledger-row .to {
-    color: var(--amber); font-family: "IBM Plex Mono", monospace;
+    color: var(--accent); font-family: "IBM Plex Mono", monospace;
     align-self: start;
   }
   .verdict {
     margin-top: 26px;
     display: inline-block;
     font-weight: 600; font-size: 1.06rem;
-    border: 1px solid color-mix(in oklab, var(--amber) 40%, var(--rule));
+    border: 1px solid color-mix(in oklab, var(--accent) 40%, var(--rule));
     border-radius: 8px; padding: 13px 18px;
-    background: color-mix(in oklab, var(--amber) 7%, transparent);
+    background: color-mix(in oklab, var(--accent) 7%, transparent);
   }
 
-  /* ── 3. Who it's for — a spec sheet, not cards ─────────────────────────── */
+  /* ── 3. The one orchestrated moment ─────────────────────────────────────
+     The thesis of the page is temporal: the call is identical, what comes
+     back is not. So the bus does not merely move a dot — it carries a
+     request out and brings each vendor's real answer back, and it keeps
+     doing it, because an instrument that stops is a picture of an
+     instrument.
+
+     The request is a line, not a panel. A boxed card here repeated the
+     sentence above it and spent half the width on an empty rectangle; as a
+     header the call reads once, and the lanes get the whole measure, which
+     is also the longest run the signal can travel.
+
+     It runs permanently, in CSS alone — no observer, no script, nothing to
+     start it and nothing that can fail to.
+
+     Everything stays readable throughout. The replies are the page's content
+     and are never hidden — the loop lights a trace, flashes the value as it
+     lands, and settles on the colour the static page already shows. The only
+     thing that stops it is prefers-reduced-motion. ─────────────────────── */
+
+  .bus { --cycle: 2.3s; margin-top: 30px; }
+
+  .bus-call {
+    display: block;
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: clamp(1rem, 2.4vw, 1.3rem);
+    color: var(--chalk); word-break: break-word;
+    margin-bottom: 11px;
+  }
+
+  /* The wire the request leaves on, and the rule the lanes hang from. */
+  .bus-wire {
+    position: relative; height: 1px; background: var(--rule);
+    overflow: hidden;
+  }
+  .bus-wire::after {
+    content: ""; position: absolute; inset: 0;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    transform: translateX(-100%); opacity: 0;
+    animation: fire var(--cycle) linear infinite;
+  }
+  @keyframes fire {
+    0%        { transform: translateX(-100%); opacity: 0; }
+    4%        { opacity: 1; }
+    22%       { transform: translateX(100%);  opacity: 1; }
+    26%, 100% { transform: translateX(100%);  opacity: 0; }
+  }
+
+  .lanes { position: relative; }
+  .lanes::before {
+    content: ""; position: absolute; left: 0; top: 0; bottom: 0;
+    width: 1px; background: var(--rule-light);
+  }
+  .lane {
+    display: grid;
+    grid-template-columns:
+      clamp(60px, 11vw, 168px) minmax(74px, auto) minmax(0, 1fr) minmax(0, auto);
+    gap: 4px clamp(14px, 2.4vw, 30px);
+    align-items: center;
+    padding-block: 14px;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .lane-track { height: 1px; background: var(--rule-light); position: relative; }
+  .lane-track::before {
+    content: ""; position: absolute; left: 0; top: 0; height: 1px;
+    width: 0; background: var(--accent); opacity: 0;
+  }
+  .lane-track::after {
+    content: ""; position: absolute; top: 50%; left: 0;
+    width: 9px; height: 9px; margin: -4.5px 0 0 -4.5px;
+    border-radius: 50%; background: var(--accent);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 22%, transparent);
+    opacity: 0;
+  }
+  .lane-track::before,
+  .lane-track::after,
+  .lane-what {
+    animation-duration: var(--cycle);
+    animation-iteration-count: infinite;
+    animation-delay: calc(var(--i) * .11s);
+  }
+  .lane-track::before { animation-name: trace;  animation-timing-function: linear; }
+  .lane-track::after  { animation-name: travel; animation-timing-function: linear; }
+  .lane-what          { animation-name: arrive; animation-timing-function: ease-out; }
+
+  @keyframes trace {
+    0%        { width: 0;    opacity: .85; }
+    24%       { width: 100%; opacity: .85; }
+    54%, 100% { width: 100%; opacity: 0; }
+  }
+  @keyframes travel {
+    0%        { left: 0;    opacity: 0; transform: scale(.4); }
+    4%        { opacity: 1; transform: scale(1); }
+    24%       { left: 100%; opacity: 1; transform: scale(1); }
+    28%, 100% { left: 100%; opacity: 0; transform: scale(.4); }
+  }
+
+  .lane-vendor { font-weight: 500; color: var(--accent); }
+  .lane-what {
+    --land-shift: -8px;
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.86rem; color: var(--chalk);
+  }
+  .lane-where {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.74rem; color: var(--haze-dim); text-align: right;
+  }
+  @keyframes arrive {
+    0%, 22%   { color: var(--haze);  opacity: .55; transform: translateX(var(--land-shift)); }
+    30%       { color: var(--accent); opacity: 1;   transform: none; }
+    54%, 100% { color: var(--chalk); opacity: 1;   transform: none; }
+  }
+
+
+  /* ── 4. Who it's for — a spec sheet, not cards ─────────────────────────── */
 
   .section { padding-block: clamp(48px, 7vw, 82px); }
   .section > .eyebrow + h2 { margin-top: 12px; }
@@ -308,10 +401,10 @@
   .spec-row .scope {
     font-family: "IBM Plex Mono", ui-monospace, monospace;
     font-size: 0.72rem; letter-spacing: .1em; text-transform: uppercase;
-    color: var(--haze-dim); margin-top: 6px;
+    color: var(--accent); margin-top: 6px;
   }
 
-  /* ── 4. The proof — the video, large ──────────────────────────────────── */
+  /* ── 5. The proof — the video, large ──────────────────────────────────── */
 
   .proof { background: var(--slate-well); border-block: 1px solid var(--rule); }
   .player {
@@ -324,7 +417,7 @@
     font-size: 0.78rem; color: var(--haze-dim);
   }
 
-  /* ── 5. Capabilities — a table, because that is what it is ─────────────── */
+  /* ── 6. Capabilities — a table, because that is what it is ─────────────── */
 
   .matrix { margin-top: 32px; border-top: 1px solid var(--rule); }
   .matrix-row {
@@ -337,12 +430,12 @@
   }
   .matrix dt {
     font-family: "IBM Plex Mono", ui-monospace, monospace;
-    font-weight: 500; font-size: 0.9rem; color: var(--amber);
+    font-weight: 600; font-size: 0.9rem; color: var(--accent);
     margin: 0;
   }
   .matrix dd { margin: 0; color: var(--haze); }
 
-  /* ── 6. Silicon — one quiet line ──────────────────────────────────────── */
+  /* ── 7. Silicon — one quiet line ──────────────────────────────────────── */
 
   .silicon {
     margin-top: 22px;
@@ -356,7 +449,7 @@
     padding-left: 9px;
   }
 
-  /* ── 7. Install — three steps, the real commands ───────────────────────── */
+  /* ── 8. Install — three steps, the real commands ───────────────────────── */
 
   .steps { margin-top: 32px; display: grid; gap: 1px; background: var(--rule); border: 1px solid var(--rule); border-radius: 10px; overflow: hidden; }
   .step {
@@ -369,8 +462,8 @@
   }
   .step-num {
     font-family: "IBM Plex Mono", ui-monospace, monospace;
-    font-size: 0.92rem; font-weight: 600; color: var(--amber);
-    border: 1px solid color-mix(in oklab, var(--amber) 35%, var(--rule));
+    font-size: 0.92rem; font-weight: 600; color: var(--accent);
+    border: 1px solid color-mix(in oklab, var(--accent) 35%, var(--rule));
     border-radius: 6px; text-align: center; padding: 3px 0;
   }
   pre.command {
@@ -382,12 +475,12 @@
   }
   pre.command .prompt { color: var(--haze-dim); user-select: none; }
 
-  /* ── 8. The call ───────────────────────────────────────────────────────── */
+  /* ── 9. The call ───────────────────────────────────────────────────────── */
 
   .call {
     border-top: 1px solid var(--rule);
     background:
-      radial-gradient(120% 140% at 50% 0%, color-mix(in oklab, var(--amber) 9%, transparent), transparent 62%),
+      radial-gradient(120% 140% at 50% 0%, color-mix(in oklab, var(--accent) 9%, transparent), transparent 62%),
       var(--slate-raised);
     padding-block: clamp(52px, 8vw, 86px);
     text-align: center;
@@ -432,6 +525,11 @@
   @media (max-width: 680px) {
     .topbar nav { display: none; }
     .spec-row, .matrix-row { grid-template-columns: 1fr; }
+    .lane { grid-template-columns: 46px minmax(0, 1fr); row-gap: 3px; padding-block: 12px; }
+    .lane-track  { grid-area: 1 / 1; }
+    .lane-vendor { grid-area: 1 / 2; }
+    .lane-what   { grid-area: 2 / 2; --land-shift: 0px; }
+    .lane-where  { grid-area: 3 / 2; text-align: left; }
     .matrix-row { padding-block: 16px; }
     .step { grid-template-columns: 34px minmax(0, 1fr); }
 
@@ -441,13 +539,19 @@
     .ledger-row { grid-template-columns: 1fr; gap: 7px; }
     .ledger-row .to { display: none; }
     .ledger-row .carries {
-      border-left: 2px solid color-mix(in oklab, var(--amber) 55%, var(--rule));
+      border-left: 2px solid color-mix(in oklab, var(--accent) 55%, var(--rule));
       padding-left: 11px;
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+    /* `*` alone does not match pseudo-elements, and the bus pulse is an
+       ::after — without the two extra selectors it would keep moving for a
+       reader who asked the system to stop motion. */
+    *, *::before, *::after {
+      transition: none !important; animation: none !important;
+      scroll-behavior: auto !important;
+    }
   }
 </style>
 </head>
@@ -475,7 +579,8 @@
       <h1>One layer above<br>your <em>toolchain</em>.</h1>
       <p class="prose">
         Deploy, monitor, govern and bill your applications and your agents —
-        on any GPU, any VM, any cloud. VibOps abstracts what you already run.
+        on any GPU, any VM, any cloud — driven by the model you choose, including
+        one that never leaves your network. VibOps abstracts what you already run.
         It does not ask you to give it up.
       </p>
       <div class="hero-actions">
@@ -484,6 +589,7 @@
       </div>
 
       <div class="stamps">
+        <span class="stamp lead">Bring your own LLM</span>
         <span class="stamp">On-prem</span>
         <span class="stamp">Air-gap</span>
         <span class="stamp">Multi-tenant</span>
@@ -571,6 +677,51 @@
 </section>
 
 <!-- ── 3 ─────────────────────────────────────────────────────────────────── -->
+<section class="section" id="mechanism">
+  <div class="shell">
+    <div class="eyebrow">How</div>
+    <h2>One request. Four vendors. No translation layer in your team's head.</h2>
+    <p class="prose" style="margin-top:14px">
+      Eleven operations carry the same name, the same payload, the same policy
+      check and the same audit record on NVIDIA, AMD, Intel and Groq. The
+      vendor difference lives below the line, where it belongs.
+    </p>
+
+    <div class="bus">
+      <code class="bus-call">accelerator_list_devices</code>
+      <div class="bus-wire" aria-hidden="true"></div>
+      <div class="lanes">
+        <div class="lane" style="--i:0">
+          <span class="lane-track" aria-hidden="true"></span>
+          <span class="lane-vendor">NVIDIA</span>
+          <span class="lane-what">H200 · 141 GB</span>
+          <span class="lane-where">nvidia.com/gpu</span>
+        </div>
+        <div class="lane" style="--i:1">
+          <span class="lane-track" aria-hidden="true"></span>
+          <span class="lane-vendor">AMD</span>
+          <span class="lane-what">MI300X · 192 GB</span>
+          <span class="lane-where">amd.com/gpu</span>
+        </div>
+        <div class="lane" style="--i:2">
+          <span class="lane-track" aria-hidden="true"></span>
+          <span class="lane-vendor">Intel</span>
+          <span class="lane-what">Gaudi 3 · 96 GB</span>
+          <span class="lane-where">gaudi.intel.com/accelerator</span>
+        </div>
+        <div class="lane" style="--i:3">
+          <span class="lane-track" aria-hidden="true"></span>
+          <span class="lane-vendor">Groq</span>
+          <span class="lane-what">LPU inference endpoints</span>
+          <span class="lane-where">api.groq.com</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ── 4 ─────────────────────────────────────────────────────────────────── -->
 <section class="section" id="who">
   <div class="shell">
     <div class="eyebrow">Who it's for</div>
@@ -615,7 +766,7 @@
   </div>
 </section>
 
-<!-- ── 4 ─────────────────────────────────────────────────────────────────── -->
+<!-- ── 5 ─────────────────────────────────────────────────────────────────── -->
 <section class="section proof" id="proof">
   <div class="shell">
     <div class="eyebrow">The proof</div>
@@ -637,7 +788,7 @@
   </div>
 </section>
 
-<!-- ── 5 ─────────────────────────────────────────────────────────────────── -->
+<!-- ── 6 ─────────────────────────────────────────────────────────────────── -->
 <section class="section" id="capabilities">
   <div class="shell">
     <div class="eyebrow">Capabilities</div>
@@ -661,6 +812,10 @@
         <dd>An inference proxy: cost per agent, per model and per organisation, with ceilings that actually stop the spend.</dd>
       </div>
       <div class="matrix-row">
+        <dt>Your own LLM</dt>
+        <dd>The Infrastructure Agent runs on the model you choose — Claude, Ollama, NVIDIA NIM or any OpenAI-compatible endpoint, including one served from your own GPUs. The agent holds no credential: it emits an intent that VibOps authenticates and policy-checks, so changing model does not change what is exposed.</dd>
+      </div>
+      <div class="matrix-row">
         <dt>Governance</dt>
         <dd>Deny by default on any unknown action, mandatory preview before destruction, hash-chained and anchored audit trail.</dd>
       </div>
@@ -672,7 +827,7 @@
   </div>
 </section>
 
-<!-- ── 6 ─────────────────────────────────────────────────────────────────── -->
+<!-- ── 7 ─────────────────────────────────────────────────────────────────── -->
 <section class="band">
   <div class="shell">
     <div class="eyebrow">Silicon</div>
@@ -690,10 +845,14 @@
       <span>Kubernetes</span><span>Slurm</span><span>Proxmox</span><span>vSphere</span>
       <span>Vates XCP-ng</span><span>Nutanix</span><span>HPE VME</span><span>Redfish</span>
     </div>
+    <div class="silicon" style="margin-top:14px">
+      <span>vLLM</span><span>Ollama</span><span>NVIDIA NIM</span>
+      <span>Anthropic</span><span>any OpenAI-compatible endpoint</span>
+    </div>
   </div>
 </section>
 
-<!-- ── 7 ─────────────────────────────────────────────────────────────────── -->
+<!-- ── 8 ─────────────────────────────────────────────────────────────────── -->
 <section class="section" id="install">
   <div class="shell">
     <div class="eyebrow">Getting started</div>
@@ -739,7 +898,7 @@
   </div>
 </section>
 
-<!-- ── 8 ─────────────────────────────────────────────────────────────────── -->
+<!-- ── 9 ─────────────────────────────────────────────────────────────────── -->
 <section class="call" id="access">
   <div class="shell">
     <div class="eyebrow">Access</div>
@@ -751,7 +910,7 @@
     <form class="access" id="waitlistForm">
       <label class="visually-hidden" for="emailInput">Work email address</label>
       <input id="emailInput" name="email" type="email" placeholder="you@company.com"
-             required autocomplete="email">
+             required autocomplete="email" aria-describedby="accessNote">
       <button class="button" id="submitBtn" type="submit">Request access</button>
     </form>
     <p class="note" id="accessNote">No cold outreach. A personal reply.</p>
@@ -778,6 +937,21 @@
     var email = document.getElementById('emailInput');
     var btn = document.getElementById('submitBtn');
     var note = document.getElementById('accessNote');
+
+    // An empty field stops the submit event from firing at all — the browser
+    // refuses it first and shows a bubble that vanishes on the next click.
+    // From the visitor's side that is a button that does nothing, so the
+    // refusal is mirrored into the note, which stays put.
+    var REST = note.textContent;
+    email.addEventListener('invalid', function () {
+      note.textContent = email.value
+        ? 'That does not look like an email address.'
+        : 'Enter your work email first.';
+      note.style.color = 'var(--critical)';
+    });
+    email.addEventListener('input', function () {
+      if (note.style.color) { note.textContent = REST; note.style.color = ''; }
+    });
 
     form.addEventListener('submit', async function (e) {
       e.preventDefault();
