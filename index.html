@@ -15,7 +15,7 @@
   <meta name="twitter:title" content="VibOps — The AI agent that runs your infrastructure">
   <meta name="twitter:description" content="From code to GPU in one conversation. It never holds your keys, it asks before it acts, and it proves what it did.">
   <meta name="twitter:image" content="https://vibops.ai/console.jpg">
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%233D8BFF'/%3E%3Cpath d='M18 18l14 30 14-30' fill='none' stroke='%23fff' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2358A6FF'/%3E%3Cpath d='M18 18l14 30 14-30' fill='none' stroke='%230A1628' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
@@ -44,8 +44,8 @@ a{color:var(--accent)}
 .bar .wrap{display:flex;align-items:center;justify-content:space-between;gap:20px;height:64px}
 .wordmark{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);font-weight:700;font-size:19px;letter-spacing:-.01em}
 .wordmark svg{width:30px;height:30px;flex:none}
-.wordmark .wm b{font-weight:inherit;color:#3D8BFF}
-.foot .wordmark .wm b{color:#3D8BFF}
+.wordmark .wm b{font-weight:inherit;color:#58A6FF}
+.foot .wordmark .wm b{color:#58A6FF}
 .nav{display:flex;align-items:center;gap:28px;font-size:14.5px;font-weight:500}
 .nav a.l{color:var(--text);text-decoration:none}
 .nav a.l:hover{color:var(--accent)}
@@ -258,7 +258,7 @@ input::placeholder{color:var(--on-navy-muted)}
 
 
 <header class="bar"><div class="wrap">
-<a class="wordmark" href="#top" aria-label="VibOps home"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#3D8BFF"/><path d="M18 18l14 30 14-30" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="wm">Vib<b>Ops</b></span></a>
+<a class="wordmark" href="#top" aria-label="VibOps home"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#58A6FF"/><path d="M18 18l14 30 14-30" fill="none" stroke="#0A1628" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="wm">Vib<b>Ops</b></span></a>
 <nav class="nav" aria-label="Main"><a class="l" href="#problem">Why VibOps</a><a class="l" href="#how">How it works</a><a class="l" href="#proof">Demo</a><a class="l" href="#who">Customers</a><a class="btn" href="#access">Request access</a></nav>
 </div></header>
 
@@ -380,11 +380,12 @@ input::placeholder{color:var(--on-navy-muted)}
 <div class="rail"><p class="label">Integrations</p></div>
 <div class="body">
 <h2>It works with what you already run.</h2>
-<p class="lede">VibOps does not ask you to give up kubectl, vCenter or sbatch. It sits one layer above them: the same request, the same policy, the same audit record, whatever is underneath.</p>
+<p class="lede">VibOps does not ask you to give up kubectl, vCenter or sbatch. It sits one layer above them: the same request, the same policy, the same audit record, whatever is underneath — a managed EKS, AKS or GKE cluster included.</p>
 <div class="runs">
 <div>
 <div class="group"><p class="label">Accelerators</p><div class="tags"><span>NVIDIA H100 · H200 · Blackwell</span><span>AMD MI300X</span><span>Intel Gaudi 3</span><span>AWS Trainium</span><span>Google TPU</span><span>Groq LPU</span><span>Cerebras WSE</span></div></div>
-<div class="group"><p class="label">Platforms and hypervisors</p><div class="tags"><span>Kubernetes</span><span>Slurm</span><span>Ray · KubeRay</span><span>Proxmox</span><span>vSphere</span><span>Vates XCP-ng</span><span>Nutanix</span><span>HPE VME</span><span>Redfish</span></div></div>
+<div class="group"><p class="label">Platforms and hypervisors</p><div class="tags"><span>Kubernetes</span><span>OpenShift</span><span>Slurm</span><span>Ray · KubeRay</span><span>Helm</span><span>Proxmox</span><span>vSphere</span><span>Vates XCP-ng</span><span>Nutanix</span><span>HPE VME</span><span>Redfish</span></div></div>
+<div class="group"><p class="label">Managed Kubernetes and clouds</p><div class="tags"><span>Amazon EKS</span><span>Azure AKS</span><span>Google GKE</span><span>NVIDIA DGX Cloud</span><span>Scaleway</span><span>Outscale</span></div></div>
 <div class="group"><p class="label">Models</p><div class="tags"><span>vLLM</span><span>Ollama</span><span>NVIDIA NIM</span><span>Anthropic</span><span>Any OpenAI-compatible endpoint</span></div></div>
 </div>
 <div class="term">
@@ -454,7 +455,7 @@ input::placeholder{color:var(--on-navy-muted)}
 
 <footer class="foot"><div class="wrap">
 <div class="cols">
-<div><a class="wordmark" href="#top"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#3D8BFF"/><path d="M18 18l14 30 14-30" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="wm">Vib<b>Ops</b></span></a><p style="margin-top:12px;max-width:32ch">The AI agent for infrastructure operations. Self-hosted, auditable, model-agnostic.</p></div>
+<div><a class="wordmark" href="#top"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#58A6FF"/><path d="M18 18l14 30 14-30" fill="none" stroke="#0A1628" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="wm">Vib<b>Ops</b></span></a><p style="margin-top:12px;max-width:32ch">The AI agent for infrastructure operations. Self-hosted, auditable, model-agnostic.</p></div>
 <div><h4>Product</h4><ul><li><a href="#capabilities">Capabilities</a></li><li><a href="#how">How it works</a></li><li><a href="#proof">Demo</a></li></ul></div>
 <div><h4>Developers</h4><ul><li><a href="#install">Install</a></li><li><a href="https://github.com/VibOpsai/vibops-mcp">MCP server · MIT</a></li><li><a href="https://github.com/VibOpsai/vibops-sdk">Python SDK · MIT</a></li></ul></div>
 <div><h4>Company</h4><ul><li><a href="#who">Who it's for</a></li><li><a href="#access">Request access</a></li></ul></div>
