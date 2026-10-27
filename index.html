@@ -2,972 +2,492 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VibOps — From code to GPU in one conversation</title>
-  <meta name="description" content="From code to GPU in one conversation. VibOps is one control plane for GPU and VM operations. Deploy, monitor, govern and bill your applications and agents on any accelerator, any hypervisor, any cloud — driven by the LLM you choose, on-prem, multi-tenant, audit-logged.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>VibOps — The AI agent that runs your infrastructure</title>
+  <meta name="description" content="From code to GPU in one conversation. VibOps is the AI agent that runs your infrastructure with the whole security and compliance harness around it: it deploys, scales, repairs and bills on your GPUs, clusters, VMs and clouds. It never holds your keys, it asks before it acts, and it proves what it did. Self-hosted, multi-tenant, any LLM.">
   <link rel="canonical" href="https://vibops.ai/">
-
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://vibops.ai/">
-  <meta property="og:title" content="VibOps — From code to GPU in one conversation">
-  <meta property="og:description" content="One control plane for GPU and VM operations. The same operations, whatever is underneath.">
+  <meta property="og:title" content="VibOps — The AI agent that runs your infrastructure">
+  <meta property="og:description" content="From code to GPU in one conversation. It never holds your keys, it asks before it acts, and it proves what it did.">
   <meta property="og:image" content="https://vibops.ai/console.jpg">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="VibOps — From code to GPU in one conversation">
-  <meta name="twitter:description" content="One control plane for GPU and VM operations. The same operations, whatever is underneath.">
+  <meta name="twitter:title" content="VibOps — The AI agent that runs your infrastructure">
+  <meta name="twitter:description" content="From code to GPU in one conversation. It never holds your keys, it asks before it acts, and it proves what it did.">
   <meta name="twitter:image" content="https://vibops.ai/console.jpg">
-
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%2358a6ff'/><text x='16' y='23' text-anchor='middle' font-size='18' font-family='sans-serif' font-weight='700' fill='%2306121F'>V</text></svg>">
-
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%233D8BFF'/%3E%3Cpath d='M18 18l14 30 14-30' fill='none' stroke='%23fff' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
-
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
-  /* ─────────────────────────────────────────────────────────────────────────
-     An instrument, not a code site.
+/* Layout: enterprise-infrastructure register. 12-column grid, section label in a left rail, hairline rules instead of cards, the product shown as a structured change record (not a chat). Square 4px corners, one cobalt accent, navy bands for figures and the call to action. Single deliberate light look. */
+:root{
+  --bg:#FFFFFF; --bg-sub:#F3F5F8; --rule:#DDE2E9; --rule-strong:#C3CBD6;
+  --ink:#0A1628; --text:#2B3A4E; --muted:#5C6B7E;
+  --accent:#3D8BFF; --accent-hover:#2A76EC; --accent-tint:#ECF3FF;
+  --navy:#0A1628; --navy-2:#13233B; --navy-rule:#24364F; --on-navy:#EEF2F7; --on-navy-muted:#9AA9BD;
+  --ok:#187A43; --ok-tint:#E5F3EA; --warn:#9A5B00; --warn-tint:#FBF0DC;
+  --sans:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  --r:4px;
+}
+html{background:var(--bg);scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:16.5px;line-height:1.6;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+a{color:var(--accent)}
+.wrap{max-width:1200px;margin:0 auto;padding-left:max(24px,env(safe-area-inset-left,0px));padding-right:max(24px,env(safe-area-inset-right,0px))}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
-     The ground is its own — #0F1319 / #161C25 / #232C3A — rather than GitHub
-     Primer's #0d1117 / #161b22, which the previous page carried verbatim. The
-     accent is #58a6ff, kept from that page: it is the colour the project is
-     recognised by, and an instrument reads in one colour. Green and red stay
-     semantic — healthy, critical — and decorate nothing.
+/* Header */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--rule)}
+.bar .wrap{display:flex;align-items:center;justify-content:space-between;gap:20px;height:64px}
+.wordmark{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);font-weight:700;font-size:19px;letter-spacing:-.01em}
+.wordmark svg{width:30px;height:30px;flex:none}
+.wordmark .wm b{font-weight:inherit;color:#3D8BFF}
+.foot .wordmark .wm b{color:#3D8BFF}
+.nav{display:flex;align-items:center;gap:28px;font-size:14.5px;font-weight:500}
+.nav a.l{color:var(--text);text-decoration:none}
+.nav a.l:hover{color:var(--accent)}
+.btn{display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:#fff;font:600 14.5px/1 var(--sans);padding:13px 20px;border-radius:var(--r);border:1px solid var(--accent);text-decoration:none;cursor:pointer;white-space:nowrap}
+.btn:hover{background:var(--accent-hover);border-color:var(--accent-hover)}
+.btn.sec{background:var(--bg);color:var(--ink);border-color:var(--rule-strong)}
+.btn.sec:hover{background:var(--bg-sub)}
+.btn .arr{font-family:var(--mono);font-weight:400}
 
-     IBM Plex, drawn by IBM for technical interfaces and readouts. Sans for
-     prose, Mono for labels, commands, and anything that reads as a measurement.
+/* Type */
+.label{font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0}
+.label.acc{color:var(--accent)}
+h1{font-size:clamp(36px,4.6vw,58px);line-height:1.04;letter-spacing:-.028em;font-weight:600;color:var(--ink);margin:0;text-wrap:balance;max-width:17ch}
+h1 .q{color:var(--muted)}
+h2{font-size:clamp(27px,3vw,38px);line-height:1.12;letter-spacing:-.022em;font-weight:600;color:var(--ink);margin:0;text-wrap:balance;max-width:24ch}
+h3{font-size:17.5px;line-height:1.3;font-weight:600;color:var(--ink);margin:0;letter-spacing:-.005em}
+p{margin:0;max-width:64ch}
+.lede{font-size:clamp(17px,1.5vw,19px);line-height:1.55;color:var(--muted);max-width:58ch}
+.lede strong{color:var(--ink);font-weight:600}
+.small{font-size:15px;color:var(--muted)}
 
-     One visual world, deliberately: an instrument is read against a dark
-     ground. A light theme forced the accent down to a muddy dark shade to
-     stay legible on white — a colour that is not the brand's. Rather than
-     ship two accents, the page commits to one and paints every surface
-     explicitly, background included, so it holds whatever the host theme is.
-     ───────────────────────────────────────────────────────────────────────── */
-  :root {
-    color-scheme: dark;
-    --slate:        #0F1319;
-    --slate-raised: #161C25;
-    --slate-well:   #0B0E13;
-    --rule:         #232C3A;
-    --rule-light:   #2E3A4B;
-    --chalk:        #E9EDF3;
-    --haze:         #8B96A5;
-    --haze-dim:     #5D6878;
-    --accent:       #58a6ff;
-    --on-accent:    #06121F;
-    --healthy:      #35C27A;
-    --critical:     #E5484D;
-    --lift:         0 24px 60px -30px rgba(0, 0, 0, .9);
+/* Sections: label rail + content */
+section{padding-block:96px;border-top:1px solid var(--rule)}
+section.sub{background:var(--bg-sub)}
+.sec-grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:32px;row-gap:20px}
+.sec-grid>.rail{grid-column:1 / span 3;padding-top:8px}
+.sec-grid>.body{grid-column:4 / span 9;display:grid;gap:22px;min-width:0}
+.rail .label{display:flex;gap:10px;align-items:baseline}
+.rail .label i{font-style:normal;color:var(--accent)}
 
-    --measure: 1180px;
-    --gutter: clamp(20px, 5vw, 56px);
-  }
+/* Hero */
+.hero{padding-block:80px 72px;border-top:0}
+.hero .wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,520px);gap:64px;align-items:center}
+.hero-copy{display:grid;gap:24px;min-width:0}
+.hero-sub{font-size:clamp(19px,1.8vw,22px);font-weight:500;color:var(--ink);letter-spacing:-.01em;margin:0}
+.hero-sub span{color:var(--accent)}
+.actions{display:flex;flex-wrap:wrap;gap:12px;padding-top:4px}
+.spec{display:flex;flex-wrap:wrap;gap:0;border-top:1px solid var(--rule);padding-top:18px;margin-top:4px}
+.spec span{font-family:var(--mono);font-size:12.5px;color:var(--muted);padding:2px 14px 2px 0;margin-right:14px;border-right:1px solid var(--rule);line-height:1.6}
+.spec span:last-child{border-right:0}
 
-  html { scroll-behavior: smooth; }
+/* Change record (product shot) */
+.record{border:1px solid var(--rule-strong);border-radius:6px;background:var(--bg);box-shadow:0 1px 2px rgba(10,22,40,.06),0 18px 48px -12px rgba(10,22,40,.18);overflow:hidden;font-size:14px;min-width:0}
+.rec-top{background:var(--navy);color:var(--on-navy);display:flex;justify-content:space-between;align-items:center;gap:12px;padding:11px 16px;font-family:var(--mono);font-size:12px}
+.rec-top .dots{display:flex;gap:6px}.rec-top .dots i{width:8px;height:8px;border-radius:50%;background:var(--navy-rule)}
+.rec-top .env{color:var(--on-navy-muted)}
+.rec-head{padding:16px 18px 14px;border-bottom:1px solid var(--rule);display:grid;gap:6px}
+.rec-id{display:flex;justify-content:space-between;align-items:center;gap:10px;font-family:var(--mono);font-size:12px;color:var(--muted)}
+.pill{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.04em;text-transform:uppercase;padding:3px 8px;border-radius:3px}
+.pill.ok{background:var(--ok-tint);color:var(--ok)}
+.pill.warn{background:var(--warn-tint);color:var(--warn)}
+.pill::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.rec-title{font-weight:600;color:var(--ink);font-size:16px;line-height:1.35}
+.rec-req{color:var(--muted);font-size:13.5px}
+.rec-req q{color:var(--text);quotes:"“" "”"}
+.kv{display:grid;grid-template-columns:110px minmax(0,1fr);border-bottom:1px solid var(--rule)}
+.kv dt,.kv dd{margin:0;padding:8px 18px;border-top:1px solid var(--rule);font-size:13px}
+.kv dt:first-of-type,.kv dd:first-of-type{border-top:0}
+.kv dt{font-family:var(--mono);font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;padding-right:0;padding-top:9px}
+.kv dd{color:var(--ink)}
+.plan{list-style:none;margin:0;padding:6px 0;border-bottom:1px solid var(--rule)}
+.plan li{display:grid;grid-template-columns:22px minmax(0,1fr) auto;gap:10px;align-items:center;padding:7px 18px;font-size:13.5px}
+.plan .n{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+.plan .t{font-family:var(--mono);font-size:11.5px;color:var(--ok)}
+.rec-foot{display:grid;gap:8px;padding:12px 18px 14px;background:var(--bg-sub)}
+.rec-foot .row{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;font-size:13px}
+.rec-foot code{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+.rec-foot b{font-weight:600;color:var(--ink)}
 
-  *, *::before, *::after { box-sizing: border-box; }
-  dl, dd { margin: 0; }
+/* Figures band */
+.band{background:var(--navy);color:var(--on-navy);border-top:0;padding-block:56px}
+.figs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0}
+.fig{padding:4px 28px;border-left:1px solid var(--navy-rule);display:grid;gap:10px;align-content:start}
+.fig:first-child{border-left:0;padding-left:0}
+.fig .v{font-size:52px;line-height:1;font-weight:600;letter-spacing:-.03em;color:#fff;font-variant-numeric:tabular-nums}
+.fig .l{font-size:14.5px;color:var(--on-navy-muted);line-height:1.45;max-width:26ch}
+.fig.badge{justify-content:start}
+.fig.badge img{height:40px;width:auto;background:#fff;border-radius:3px;padding:6px 10px}
+.trust{display:flex;flex-wrap:wrap;gap:10px 0;margin-top:40px;padding-top:22px;border-top:1px solid var(--navy-rule);font-family:var(--mono);font-size:12.5px;color:var(--on-navy-muted)}
+.trust span{padding-right:18px;margin-right:18px;border-right:1px solid var(--navy-rule)}
+.trust span:last-child{border-right:0}
 
-  body {
-    margin: 0;
-    background: var(--slate);
-    color: var(--chalk);
-    font-family: "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-    font-size: 16px;
-    line-height: 1.62;
-    -webkit-font-smoothing: antialiased;
-  }
+/* Problem table */
+.table{border-top:2px solid var(--ink);margin-top:6px}
+.table .tr{display:grid;grid-template-columns:200px minmax(0,1fr);gap:24px;padding:16px 0;border-bottom:1px solid var(--rule);align-items:baseline}
+.table .th{font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:12px 0}
+.table .b{font-weight:600;color:var(--ink)}
+.table .t{color:var(--muted);font-size:15.5px}
+.verdict{font-size:clamp(19px,1.8vw,22px);font-weight:600;color:var(--ink);letter-spacing:-.01em;border-left:3px solid var(--accent);padding-left:16px;margin-top:6px}
 
-  section[id] { scroll-margin-top: 86px; }
+/* Promises: three columns divided by rules */
+.cols3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid var(--rule-strong);margin-top:10px}
+.cols3>div{padding:24px 24px 4px 0;display:grid;gap:10px;align-content:start}
+.cols3>div+div{padding-left:24px;border-left:1px solid var(--rule)}
+.cols3 .k{font-family:var(--mono);font-size:12px;color:var(--accent);letter-spacing:.04em}
+.cols3 p{font-size:15px;color:var(--muted)}
 
-  .shell {
-    max-width: var(--measure);
-    margin-inline: auto;
-    padding-inline: var(--gutter);
-  }
+/* Process */
+.process{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;margin-top:10px;counter-reset:s}
+.process>div{position:relative;padding:34px 22px 0 0;display:grid;gap:8px;align-content:start}
+.process>div::before{counter-increment:s;content:counter(s);position:absolute;top:0;left:0;width:22px;height:22px;border-radius:50%;background:var(--bg);border:1.5px solid var(--accent);color:var(--accent);font:500 11.5px/19px var(--mono);text-align:center}
+.process>div::after{content:"";position:absolute;top:11px;left:30px;right:8px;height:1px;background:var(--rule-strong)}
+.process>div:last-child::after{display:none}
+.process>div:last-child::before{background:var(--accent);color:#fff}
+.process p{font-size:15px;color:var(--muted)}
 
-  a { color: inherit; }
-  a:focus-visible, button:focus-visible, input:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 3px;
-  }
-  img, video { max-width: 100%; height: auto; display: block; }
+/* Demo */
+.video{border:1px solid var(--rule-strong);border-radius:6px;overflow:hidden;background:var(--navy);box-shadow:0 18px 48px -14px rgba(10,22,40,.22)}
+.video video{display:block;width:100%;height:auto}
+.chapters{display:flex;flex-wrap:wrap;gap:0;font-family:var(--mono);font-size:12.5px;color:var(--muted);border-top:1px solid var(--rule);padding-top:12px}
+.chapters span{padding-right:14px;margin-right:14px;border-right:1px solid var(--rule)}
+.chapters span:last-child{border-right:0}
 
-  /* ── Typographic vocabulary ────────────────────────────────────────────── */
+/* Capabilities: ruled grid */
+.caps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid var(--rule-strong);border-left:1px solid var(--rule);margin-top:10px}
+.caps>div{padding:24px;border-right:1px solid var(--rule);border-bottom:1px solid var(--rule);display:grid;gap:10px;align-content:start;background:var(--bg)}
+.caps svg{width:22px;height:22px;stroke:var(--accent);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.caps p{font-size:15px;color:var(--muted)}
 
-  /* The accent is the page's voice, not a rare highlight: section markers,
-     row headings, measured figures, the live pulse. On this ground #58a6ff
-     reads at roughly 7:1, so using it everywhere costs no legibility — which
-     is exactly what a single dark theme buys. */
-  .eyebrow {
-    font-family: "IBM Plex Mono", ui-monospace, monospace;
-    font-size: 0.7rem;
-    font-weight: 500;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--accent);
-  }
+/* Runs */
+.runs{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:40px;align-items:start}
+.group{display:grid;gap:10px;padding-bottom:18px}
+.group+.group{border-top:1px solid var(--rule);padding-top:18px}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tags span{font-size:13px;padding:4px 9px;border:1px solid var(--rule-strong);border-radius:3px;background:var(--bg);color:var(--text)}
+.term{border:1px solid var(--rule-strong);border-radius:6px;overflow:hidden;background:var(--bg);min-width:0}
+.term .h{padding:11px 16px;background:var(--navy);color:var(--on-navy-muted);font-family:var(--mono);font-size:12px}
+.term .h b{color:#fff;font-weight:500}
+.term .tbl{overflow-x:auto}
+.term table{border-collapse:collapse;width:100%;font-size:13.5px}
+.term th,.term td{text-align:left;padding:10px 16px;border-bottom:1px solid var(--rule);white-space:nowrap}
+.term td:last-child{white-space:normal}
+.term th{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;background:var(--bg-sub)}
+.term td:first-child{font-weight:600;color:var(--ink)}
+.term td code{font-family:var(--mono);font-size:12px;color:var(--muted);word-break:break-all;white-space:normal}
+.term .f{padding:12px 16px;font-size:13.5px;color:var(--muted);background:var(--bg-sub)}
 
-  h1, h2, h3 { margin: 0; text-wrap: balance; font-weight: 600; letter-spacing: -0.02em; }
-  h1 { font-size: clamp(2.2rem, 5.4vw, 3.5rem); line-height: 1.07; letter-spacing: -0.035em; }
-  h2 { font-size: clamp(1.7rem, 3.6vw, 2.4rem); line-height: 1.16; }
-  h3 { font-size: 1.06rem; letter-spacing: -0.01em; }
+/* Audiences */
+.aud{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:32px;margin-top:10px}
+.aud>div{display:grid;gap:10px;align-content:start;border-top:2px solid var(--ink);padding-top:18px}
+.aud .tag{font-family:var(--mono);font-size:11.5px;color:var(--muted);letter-spacing:.03em}
+.aud p{font-size:15px;color:var(--muted)}
 
-  p { margin: 0; }
-  .prose { color: var(--haze); max-width: 62ch; }
+/* Models */
+.mtable{border-top:2px solid var(--ink)}
+.mtable .tr{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px;padding:13px 0;border-bottom:1px solid var(--rule);font-size:15px;align-items:baseline}
+.mtable .tr span:last-child{font-family:var(--mono);font-size:12px;color:var(--muted)}
 
-  .prose a, .foot a.repo {
-    color: var(--chalk); text-decoration: underline;
-    text-decoration-color: color-mix(in oklab, var(--accent) 60%, transparent);
-    text-underline-offset: 3px;
-  }
-  .prose a:hover, .foot a.repo:hover { color: var(--accent); }
+/* Install */
+.steps3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:32px;margin-top:10px}
+.steps3>div{display:grid;gap:10px;align-content:start;min-width:0}
+.steps3 .k{font-family:var(--mono);font-size:12px;color:var(--accent)}
+.steps3 p{font-size:15px;color:var(--muted)}
+.cmd{font-family:var(--mono);font-size:12.5px;background:var(--navy);color:var(--on-navy);padding:11px 14px;border-radius:var(--r);white-space:pre-wrap;word-break:break-all}
+.cmd b{color:#7FB0FF;font-weight:400;margin-right:6px}
 
-  .mono { font-family: "IBM Plex Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+/* CTA */
+.cta{background:var(--navy);color:var(--on-navy);border-top:0;padding-block:88px}
+.cta .label{color:#7FB0FF}
+.cta h2{color:#fff}
+.cta .lede{color:var(--on-navy-muted)}
+.cta .grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,460px);gap:56px;align-items:end}
+.cta .left{display:grid;gap:18px}
+form{display:grid;gap:10px}
+form label{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--on-navy-muted)}
+.frow{display:flex;gap:8px;flex-wrap:wrap}
+input{flex:1;min-width:0;width:100%;background:var(--navy-2);border:1px solid var(--navy-rule);color:#fff;padding:13px 14px;border-radius:var(--r);font:inherit;font-size:15px}
+input::placeholder{color:var(--on-navy-muted)}
+.frow input{flex:1 1 220px}
+.note{font-size:13.5px;color:var(--on-navy-muted)}
 
-  /* ── Navigation bar ────────────────────────────────────────────────────── */
+/* Footer */
+.foot{background:var(--navy);color:var(--on-navy-muted);border-top:1px solid var(--navy-rule);padding-block:44px 32px;font-size:14px}
+.foot .cols{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:32px}
+.foot .wordmark{color:#fff}
+.foot h4{font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:#fff;font-weight:500;margin:0 0 12px}
+.foot ul{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.foot a{color:var(--on-navy-muted);text-decoration:none}
+.foot a:hover{color:#fff}
+.foot .legal{margin-top:36px;padding-top:18px;border-top:1px solid var(--navy-rule);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;font-family:var(--mono);font-size:12px}
 
-  header.topbar {
-    border-bottom: 1px solid var(--rule);
-    background: color-mix(in oklab, var(--slate) 92%, transparent);
-    position: sticky; top: 0; z-index: 20;
-    backdrop-filter: blur(8px);
-  }
-  .topbar .shell {
-    display: flex; align-items: center; gap: 28px;
-    min-height: 72px;
-  }
-  .wordmark {
-    font-weight: 700; letter-spacing: -0.03em;
-    font-size: clamp(1.35rem, 2.4vw, 1.6rem);
-    text-decoration: none; margin-right: auto;
-    display: inline-flex; align-items: baseline; gap: 2px;
-  }
-  .wordmark span { color: var(--accent); }
-  .topbar nav { display: flex; gap: 24px; }
-  .topbar nav a {
-    text-decoration: none; color: var(--haze); font-size: 0.92rem;
-    transition: color .18s;
-  }
-  .topbar nav a:hover { color: var(--chalk); }
-
-  .button {
-    font: inherit; font-weight: 600; font-size: 0.92rem;
-    border: 1px solid var(--accent);
-    background: var(--accent); color: var(--on-accent);
-    padding: 9px 17px; border-radius: 7px; cursor: pointer;
-    text-decoration: none; white-space: nowrap;
-    transition: filter .18s, transform .18s;
-  }
-  .button:hover { filter: brightness(1.08); }
-  .button:active { transform: translateY(1px); }
-  .button.hollow { background: transparent; color: var(--chalk); border-color: var(--rule-light); }
-  .button.hollow:hover { border-color: var(--haze); }
-
-  /* ── 1. Hero — asymmetric, the product on the right ───────────────────── */
-
-  .hero { padding-block: clamp(52px, 8vw, 92px) clamp(44px, 6vw, 72px); }
-  .hero-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1.06fr) minmax(0, 1fr);
-    gap: clamp(32px, 5vw, 60px);
-    align-items: center;
-  }
-  .hero h1 { margin-block: 18px 0; }
-  .hero h1 em { font-style: normal; color: var(--accent); }
-  .hero .prose { margin-top: 20px; font-size: 1.08rem; }
-
-  .hero-actions { margin-top: 28px; display: flex; flex-wrap: wrap; gap: 10px; }
-  .hero-actions .button { padding: 11px 20px; font-size: 0.95rem; }
-
-  .stamps {
-    margin-top: 22px; display: flex; flex-wrap: wrap; gap: 8px 10px;
-    font-size: 0.78rem;
-  }
-  .stamp {
-    font-family: "IBM Plex Mono", ui-monospace, monospace;
-    border: 1px solid var(--rule); border-radius: 999px;
-    padding: 4px 11px; color: var(--haze);
-  }
-  .stamp.lead { border-color: color-mix(in oklab, var(--accent) 45%, var(--rule)); color: var(--accent); }
-
-  .product-frame {
-    border: 1px solid var(--rule); border-radius: 12px;
-    background: var(--slate-well);
-    overflow: hidden;
-    box-shadow: var(--lift);
-  }
-  .frame-chrome {
-    display: flex; align-items: center; gap: 7px;
-    padding: 9px 13px; border-bottom: 1px solid var(--rule);
-    background: var(--slate-raised);
-  }
-  .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--rule-light); }
-  .frame-chrome .where {
-    margin-left: 8px; font-family: "IBM Plex Mono", monospace;
-    font-size: 0.7rem; color: var(--haze-dim);
-  }
-
-  /* ── Credential strip — the badge is drawn for a light ground and NVIDIA's
-     terms forbid recolouring it, so it sits unaltered on a white plate. ───── */
-
-  .credential { border-top: 1px solid var(--rule); padding-block: clamp(22px, 3.5vw, 34px); }
-  .credential .shell {
-    display: flex; align-items: center; flex-wrap: wrap;
-    gap: clamp(16px, 3vw, 32px);
-  }
-  .plate {
-    background: #fff; border-radius: 7px;
-    padding: 11px 14px; flex: none; line-height: 0;
-  }
-  .plate img { width: 178px; }
-
-  .figures { display: flex; flex-wrap: wrap; gap: 14px clamp(18px, 3vw, 38px); }
-  .figures > div { display: flex; flex-direction: column; gap: 3px; max-width: 25ch; }
-  .figures dt {
-    font-family: "IBM Plex Mono", ui-monospace, monospace;
-    font-variant-numeric: tabular-nums;
-    font-size: 1.75rem; font-weight: 600; line-height: 1;
-    color: var(--accent); margin: 0;
-  }
-  .figures dd { font-size: 0.82rem; line-height: 1.42; color: var(--haze); }
-
-  /* ── 2. The problem — a ledger, because it is one ──────────────────────── */
-
-  .band {
-    border-block: 1px solid var(--rule);
-    background: var(--slate-raised);
-    padding-block: clamp(40px, 6vw, 62px);
-  }
-  .ledger { margin-top: 28px; border-top: 1px solid var(--rule); }
-  .ledger-head, .ledger-row {
-    display: grid;
-    grid-template-columns: minmax(150px, 27%) 22px minmax(0, 1fr);
-    gap: 5px clamp(14px, 3vw, 30px);
-    padding-block: 15px;
-    border-bottom: 1px solid var(--rule);
-    align-items: baseline;
-  }
-  .ledger-head { padding-block: 9px; }
-  .ledger-head span {
-    font-family: "IBM Plex Mono", ui-monospace, monospace;
-    font-size: 0.68rem; letter-spacing: .12em; text-transform: uppercase;
-    color: var(--accent);
-  }
-  .ledger-row .bought { color: var(--chalk); font-weight: 500; }
-  .ledger-row .carries { color: var(--haze); }
-  .ledger-row .to {
-    color: var(--accent); font-family: "IBM Plex Mono", monospace;
-    align-self: start;
-  }
-  .verdict {
-    margin-top: 26px;
-    display: inline-block;
-    font-weight: 600; font-size: 1.06rem;
-    border: 1px solid color-mix(in oklab, var(--accent) 40%, var(--rule));
-    border-radius: 8px; padding: 13px 18px;
-    background: color-mix(in oklab, var(--accent) 7%, transparent);
-  }
-
-  /* ── 3. The one orchestrated moment ─────────────────────────────────────
-     The thesis of the page is temporal: the call is identical, what comes
-     back is not. So the bus does not merely move a dot — it carries a
-     request out and brings each vendor's real answer back, and it keeps
-     doing it, because an instrument that stops is a picture of an
-     instrument.
-
-     The request is a line, not a panel. A boxed card here repeated the
-     sentence above it and spent half the width on an empty rectangle; as a
-     header the call reads once, and the lanes get the whole measure, which
-     is also the longest run the signal can travel.
-
-     It runs permanently, in CSS alone — no observer, no script, nothing to
-     start it and nothing that can fail to.
-
-     Everything stays readable throughout. The replies are the page's content
-     and are never hidden — the loop lights a trace, flashes the value as it
-     lands, and settles on the colour the static page already shows. The only
-     thing that stops it is prefers-reduced-motion. ─────────────────────── */
-
-  .bus { --cycle: 2.3s; margin-top: 30px; }
-
-  .bus-call {
-    display: block;
-    font-family: "IBM Plex Mono", ui-monospace, monospace;
-    font-size: clamp(1rem, 2.4vw, 1.3rem);
-    color: var(--chalk); word-break: break-word;
-    margin-bottom: 11px;
-  }
-
-  /* The wire the request leaves on, and the rule the lanes hang from. */
-  .bus-wire {
-    position: relative; height: 1px; background: var(--rule);
-    overflow: hidden;
-  }
-  .bus-wire::after {
-    content: ""; position: absolute; inset: 0;
-    background: linear-gradient(90deg, transparent, var(--accent), transparent);
-    transform: translateX(-100%); opacity: 0;
-    animation: fire var(--cycle) linear infinite;
-  }
-  @keyframes fire {
-    0%        { transform: translateX(-100%); opacity: 0; }
-    4%        { opacity: 1; }
-    22%       { transform: translateX(100%);  opacity: 1; }
-    26%, 100% { transform: translateX(100%);  opacity: 0; }
-  }
-
-  .lanes { position: relative; }
-  .lanes::before {
-    content: ""; position: absolute; left: 0; top: 0; bottom: 0;
-    width: 1px; background: var(--rule-light);
-  }
-  .lane {
-    display: grid;
-    grid-template-columns:
-      clamp(60px, 11vw, 168px) minmax(74px, auto) minmax(0, 1fr) minmax(0, auto);
-    gap: 4px clamp(14px, 2.4vw, 30px);
-    align-items: center;
-    padding-block: 14px;
-    border-bottom: 1px solid var(--rule);
-  }
-
-  .lane-track { height: 1px; background: var(--rule-light); position: relative; }
-  .lane-track::before {
-    content: ""; position: absolute; left: 0; top: 0; height: 1px;
-    width: 0; background: var(--accent); opacity: 0;
-  }
-  .lane-track::after {
-    content: ""; position: absolute; top: 50%; left: 0;
-    width: 9px; height: 9px; margin: -4.5px 0 0 -4.5px;
-    border-radius: 50%; background: var(--accent);
-    box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 22%, transparent);
-    opacity: 0;
-  }
-  .lane-track::before,
-  .lane-track::after,
-  .lane-what {
-    animation-duration: var(--cycle);
-    animation-iteration-count: infinite;
-    animation-delay: calc(var(--i) * .11s);
-  }
-  .lane-track::before { animation-name: trace;  animation-timing-function: linear; }
-  .lane-track::after  { animation-name: travel; animation-timing-function: linear; }
-  .lane-what          { animation-name: arrive; animation-timing-function: ease-out; }
-
-  @keyframes trace {
-    0%        { width: 0;    opacity: .85; }
-    24%       { width: 100%; opacity: .85; }
-    54%, 100% { width: 100%; opacity: 0; }
-  }
-  @keyframes travel {
-    0%        { left: 0;    opacity: 0; transform: scale(.4); }
-    4%        { opacity: 1; transform: scale(1); }
-    24%       { left: 100%; opacity: 1; transform: scale(1); }
-    28%, 100% { left: 100%; opacity: 0; transform: scale(.4); }
-  }
-
-  .lane-vendor { font-weight: 500; color: var(--accent); }
-  .lane-what {
-    --land-shift: -8px;
-    font-family: "IBM Plex Mono", ui-monospace, monospace;
-    font-size: 0.86rem; color: var(--chalk);
-  }
-  .lane-where {
-    font-family: "IBM Plex Mono", ui-monospace, monospace;
-    font-size: 0.74rem; color: var(--haze-dim); text-align: right;
-  }
-  @keyframes arrive {
-    0%, 22%   { color: var(--haze);  opacity: .55; transform: translateX(var(--land-shift)); }
-    30%       { color: var(--accent); opacity: 1;   transform: none; }
-    54%, 100% { color: var(--chalk); opacity: 1;   transform: none; }
-  }
-
-
-  /* ── 4. Who it's for — a spec sheet, not cards ─────────────────────────── */
-
-  .section { padding-block: clamp(48px, 7vw, 82px); }
-  .section > .eyebrow + h2 { margin-top: 12px; }
-  .section > h2 + .prose { margin-top: 14px; }
-
-  .spec { margin-top: 34px; border-top: 1px solid var(--rule); }
-  .spec-row {
-    display: grid;
-    grid-template-columns: minmax(170px, 24%) minmax(0, 1fr);
-    gap: 10px clamp(20px, 4vw, 48px);
-    padding-block: 26px;
-    border-bottom: 1px solid var(--rule);
-  }
-  .spec-row h3 { color: var(--chalk); }
-  .spec-row .scope {
-    font-family: "IBM Plex Mono", ui-monospace, monospace;
-    font-size: 0.72rem; letter-spacing: .1em; text-transform: uppercase;
-    color: var(--accent); margin-top: 6px;
-  }
-
-  /* ── 5. The proof — the video, large ──────────────────────────────────── */
-
-  .proof { background: var(--slate-well); border-block: 1px solid var(--rule); }
-  .player {
-    margin-top: 28px; border: 1px solid var(--rule); border-radius: 12px;
-    overflow: hidden; background: #000;
-  }
-  .under-video {
-    margin-top: 14px; display: flex; flex-wrap: wrap; gap: 6px 22px;
-    font-family: "IBM Plex Mono", ui-monospace, monospace;
-    font-size: 0.78rem; color: var(--haze-dim);
-  }
-
-  /* ── 6. Capabilities — a table, because that is what it is ─────────────── */
-
-  .matrix { margin-top: 32px; border-top: 1px solid var(--rule); }
-  .matrix-row {
-    display: grid;
-    grid-template-columns: minmax(160px, 22%) minmax(0, 1fr);
-    gap: 6px clamp(20px, 4vw, 44px);
-    padding-block: 20px;
-    border-bottom: 1px solid var(--rule);
-    align-items: baseline;
-  }
-  .matrix dt {
-    font-family: "IBM Plex Mono", ui-monospace, monospace;
-    font-weight: 600; font-size: 0.9rem; color: var(--accent);
-    margin: 0;
-  }
-  .matrix dd { margin: 0; color: var(--haze); }
-
-  /* ── 7. Silicon — one quiet line ──────────────────────────────────────── */
-
-  .silicon {
-    margin-top: 22px;
-    display: flex; flex-wrap: wrap; gap: 8px 10px;
-    font-family: "IBM Plex Mono", ui-monospace, monospace;
-    font-size: 0.82rem;
-  }
-  .silicon span {
-    color: var(--haze);
-    border-left: 2px solid var(--rule-light);
-    padding-left: 9px;
-  }
-
-  /* ── 8. Install — three steps, the real commands ───────────────────────── */
-
-  .steps { margin-top: 32px; display: grid; gap: 1px; background: var(--rule); border: 1px solid var(--rule); border-radius: 10px; overflow: hidden; }
-  .step {
-    display: grid;
-    grid-template-columns: 46px minmax(0, 1fr);
-    gap: clamp(14px, 3vw, 28px);
-    background: var(--slate);
-    padding: 22px clamp(16px, 3vw, 26px);
-    align-items: start;
-  }
-  .step-num {
-    font-family: "IBM Plex Mono", ui-monospace, monospace;
-    font-size: 0.92rem; font-weight: 600; color: var(--accent);
-    border: 1px solid color-mix(in oklab, var(--accent) 35%, var(--rule));
-    border-radius: 6px; text-align: center; padding: 3px 0;
-  }
-  pre.command {
-    margin: 12px 0 0; padding: 12px 14px;
-    background: var(--slate-well); border: 1px solid var(--rule);
-    border-radius: 7px; overflow-x: auto;
-    font-family: "IBM Plex Mono", ui-monospace, monospace;
-    font-size: 0.82rem; color: var(--chalk);
-  }
-  pre.command .prompt { color: var(--haze-dim); user-select: none; }
-
-  /* ── 9. The call ───────────────────────────────────────────────────────── */
-
-  .call {
-    border-top: 1px solid var(--rule);
-    background:
-      radial-gradient(120% 140% at 50% 0%, color-mix(in oklab, var(--accent) 9%, transparent), transparent 62%),
-      var(--slate-raised);
-    padding-block: clamp(52px, 8vw, 86px);
-    text-align: center;
-  }
-  .call .prose { margin-inline: auto; margin-top: 14px; }
-  form.access {
-    margin: 30px auto 0; display: flex; flex-wrap: wrap; gap: 10px;
-    max-width: 480px;
-  }
-  form.access input {
-    flex: 1 1 220px; min-width: 0;
-    font: inherit; color: var(--chalk);
-    background: var(--slate-well);
-    border: 1px solid var(--rule-light); border-radius: 7px;
-    padding: 11px 14px;
-  }
-  form.access input::placeholder { color: var(--haze-dim); }
-  .note { margin-top: 12px; font-size: 0.8rem; color: var(--haze-dim); }
-
-  .visually-hidden {
-    position: absolute; width: 1px; height: 1px;
-    overflow: hidden; clip-path: inset(50%);
-  }
-
-  footer.foot {
-    border-top: 1px solid var(--rule);
-    padding-block: 30px;
-    color: var(--haze-dim); font-size: 0.85rem;
-  }
-  .foot .shell {
-    display: flex; flex-direction: column; align-items: center;
-    gap: 14px; text-align: center;
-  }
-  .foot-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 26px; }
-  .foot a { color: var(--haze); text-decoration: none; }
-  .foot a:hover { color: var(--chalk); }
-  .foot-mark {
-    font-family: "IBM Plex Mono", ui-monospace, monospace;
-    font-size: 0.78rem; color: var(--haze-dim);
-  }
-  .foot-mark b { font-weight: 600; color: var(--haze); }
-
-  /* ── Breakpoints: three, not one ───────────────────────────────────────── */
-
-  @media (max-width: 960px) {
-    .hero-grid { grid-template-columns: 1fr; gap: 34px; }
-    .ledger-head, .ledger-row { grid-template-columns: minmax(130px, 34%) 22px minmax(0, 1fr); }
-  }
-
-  @media (max-width: 680px) {
-    .topbar nav { display: none; }
-    .spec-row, .matrix-row { grid-template-columns: 1fr; }
-    .lane { grid-template-columns: 46px minmax(0, 1fr); row-gap: 3px; padding-block: 12px; }
-    .lane-track  { grid-area: 1 / 1; }
-    .lane-vendor { grid-area: 1 / 2; }
-    .lane-what   { grid-area: 2 / 2; --land-shift: 0px; }
-    .lane-where  { grid-area: 3 / 2; text-align: left; }
-    .matrix-row { padding-block: 16px; }
-    .step { grid-template-columns: 34px minmax(0, 1fr); }
-
-    /* The two columns no longer line up, so the header stops describing
-       anything: each entry becomes a stacked pair instead. */
-    .ledger-head { display: none; }
-    .ledger-row { grid-template-columns: 1fr; gap: 7px; }
-    .ledger-row .to { display: none; }
-    .ledger-row .carries {
-      border-left: 2px solid color-mix(in oklab, var(--accent) 55%, var(--rule));
-      padding-left: 11px;
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    /* `*` alone does not match pseudo-elements, and the bus pulse is an
-       ::after — without the two extra selectors it would keep moving for a
-       reader who asked the system to stop motion. */
-    *, *::before, *::after {
-      transition: none !important; animation: none !important;
-      scroll-behavior: auto !important;
-    }
-  }
+@media (max-width:980px){
+  .sec-grid{grid-template-columns:minmax(0,1fr);column-gap:0}
+  .hero .wrap,.cta .grid,.runs{grid-template-columns:minmax(0,1fr)}
+  .sec-grid>.rail,.sec-grid>.body{grid-column:1 / -1}
+  .figs{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:28px}
+  .fig:nth-child(3){border-left:0;padding-left:0}
+  .process{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:28px}
+  .process>div:nth-child(2)::after{display:none}
+  .caps{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .foot .cols{grid-template-columns:1fr 1fr}
+  .nav a.l{display:none}
+}
+@media (max-width:640px){
+  section{padding-block:64px}.hero{padding-block:48px}
+  .table .tr:first-child{display:none}
+  .term th,.term td{white-space:normal}.term td code{word-break:break-all}
+  .cmd{white-space:pre-wrap;word-break:break-all}
+  .mtable .tr{grid-template-columns:minmax(0,1fr)}
+  .cols3,.aud,.steps3,.caps,.process{grid-template-columns:minmax(0,1fr)}
+  .cols3>div+div{padding-left:0;border-left:0;border-top:1px solid var(--rule)}
+  .process>div::after{display:none}
+  .table .tr{grid-template-columns:1fr;gap:4px}
+  .figs{grid-template-columns:1fr}.fig{border-left:0;padding-left:0}
+  .kv{grid-template-columns:96px minmax(0,1fr)}
+}
 </style>
 </head>
 <body>
 
 
-<header class="topbar">
-  <div class="shell">
-    <a class="wordmark" href="#">Vib<span>Ops</span></a>
-    <nav>
-      <a href="#problem">Why VibOps</a>
-      <a href="#who">Solutions</a>
-      <a href="#capabilities">Platform</a>
-      <a href="#install">Install</a>
-    </nav>
-    <a class="button" href="#access">Request access</a>
-  </div>
-</header>
+<header class="bar"><div class="wrap">
+<a class="wordmark" href="#top" aria-label="VibOps home"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#3D8BFF"/><path d="M18 18l14 30 14-30" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="wm">Vib<b>Ops</b></span></a>
+<nav class="nav" aria-label="Main"><a class="l" href="#problem">Why VibOps</a><a class="l" href="#how">How it works</a><a class="l" href="#proof">Demo</a><a class="l" href="#who">Customers</a><a class="btn" href="#access">Request access</a></nav>
+</div></header>
 
-<!-- ── 1 ─────────────────────────────────────────────────────────────────── -->
-<section class="hero">
-  <div class="shell hero-grid">
-    <div>
-      <div class="eyebrow">GPU · VM · Agents · Sovereign</div>
-      <h1>From code to GPU in <em>one conversation</em>.</h1>
-      <p class="prose">
-        Deploy, monitor, govern and bill your applications and your agents on any
-        GPU, any VM, any cloud — driven by the model you choose, including one that
-        never leaves your network. One layer above your toolchain, not another tool
-        in it.
-      </p>
-      <div class="hero-actions">
-        <a class="button" href="#access">Request access</a>
-        <a class="button hollow" href="#proof">Watch the demo</a>
-      </div>
+<main id="top">
+<section class="hero"><div class="wrap">
+<div class="hero-copy">
+<p class="label acc">AI agent for infrastructure operations</p>
+<h1>The AI agent that runs your infrastructure. <span class="q">With the whole harness around it.</span></h1>
+<p class="hero-sub">From code to GPU in <span>one conversation</span>.</p>
+<p class="lede">Tell it what you need, in plain language: it deploys, scales, repairs and bills, on your GPUs, your clusters, your VMs and your clouds. <strong>It never holds your keys, it asks before it acts, and it proves what it did.</strong> One layer above your toolchain, not another tool in it.</p>
+<div class="actions"><a class="btn" href="#access">Request access <span class="arr">→</span></a><a class="btn sec" href="#proof">Watch the demo</a></div>
+<div class="spec"><span>Bring your own LLM</span><span>Self-hosted</span><span>Air-gap</span><span>Multi-tenant</span><span>SOC 2 audit trail</span><span>MCP server &amp; SDK: MIT</span></div>
+</div>
 
-      <div class="stamps">
-        <span class="stamp lead">Bring your own LLM</span>
-        <span class="stamp">On-prem</span>
-        <span class="stamp">Air-gap</span>
-        <span class="stamp">Multi-tenant</span>
-        <span class="stamp">SOC 2 audit trail</span>
-        <span class="stamp lead">MCP server &amp; SDK: MIT</span>
-      </div>
-    </div>
+<div class="record" aria-label="Example change record in the VibOps console">
+<div class="rec-top"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span>VibOps console · example</span><span class="env">site: mtl-dc2</span></div>
+<div class="rec-head">
+<div class="rec-id"><span>CHG-2041</span><span class="pill ok">Completed · verified</span></div>
+<div class="rec-title">Take gpu-07 out of service before firmware upgrade</div>
+<div class="rec-req">Request: <q>Don't kill anything that's running.</q></div>
+</div>
+<dl class="kv">
+<dt>Target</dt><dd>gpu-07 · 2 training jobs · 1 Ray worker</dd>
+<dt>Policy</dt><dd>Drain = risky → preview and approval required</dd>
+<dt>Approved</dt><dd>Platform lead · 21:04</dd>
+</dl>
+<ol class="plan">
+<li><span class="n">1</span><span>Cordon gpu-07</span><span class="t">✓ 21:04</span></li>
+<li><span class="n">2</span><span>Wait for both training jobs to finish</span><span class="t">✓ 21:43</span></li>
+<li><span class="n">3</span><span>Move Ray worker to gpu-03</span><span class="t">✓ 21:44</span></li>
+<li><span class="n">4</span><span>Drain node. Nothing deleted.</span><span class="t">✓ 21:45</span></li>
+</ol>
+<div class="rec-foot">
+<div class="row"><b>State read back after the action</b><span class="pill ok">Proven</span></div>
+<div class="row"><span>Recorded in the audit trail</span><code>sha256 · 9f3c…a41e</code></div>
+</div>
+</div>
+</div></section>
 
-    <figure class="product-frame" style="margin:0">
-      <div class="frame-chrome" aria-hidden="true">
-        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-        <span class="where">console · your infrastructure</span>
-      </div>
-      <img src="console.jpg" width="1700" height="851"
-           alt="The VibOps console: GPU cluster health, cost per tenant, and the conversation thread that runs the actions.">
-    </figure>
-  </div>
-</section>
+<section class="band"><div class="wrap">
+<div class="figs">
+<div class="fig"><div class="v">35</div><div class="l">connectors across accelerators, clusters, hypervisors and clouds</div></div>
+<div class="fig"><div class="v">11</div><div class="l">operations identical on NVIDIA, AMD, Intel and Groq</div></div>
+<div class="fig"><div class="v">0</div><div class="l">inbound ports opened on your network</div></div>
+<div class="fig badge"><img src="nvidia-inception.svg" alt="NVIDIA Inception program member"><div class="l">Member of the NVIDIA Inception program</div></div>
+</div>
+<div class="trust"><span>Self-hosted, on your own ground</span><span>Tenants isolated in the database</span><span>Hash-chained, anchored audit trail</span><span>Montréal, Canada</span></div>
+</div></section>
 
-<!-- ── Credential ────────────────────────────────────────────────────────── -->
-<section class="credential">
-  <div class="shell">
-    <span class="plate">
-      <img src="nvidia-inception.svg" width="500" height="216"
-           alt="NVIDIA Inception Program member">
-    </span>
-    <dl class="figures">
-      <div>
-        <dt>33</dt>
-        <dd>connectors — accelerators, clusters, hypervisors, clouds</dd>
-      </div>
-      <div>
-        <dt>11</dt>
-        <dd>operations identical on NVIDIA, AMD, Intel and Groq</dd>
-      </div>
-      <div>
-        <dt>0</dt>
-        <dd>inbound ports opened on your network</dd>
-      </div>
-    </dl>
-  </div>
-</section>
+<section id="problem"><div class="wrap sec-grid">
+<div class="rail"><p class="label">The problem</p></div>
+<div class="body">
+<h2>Capacity scales. Operations don't. And the obvious fix can't be trusted, until now.</h2>
+<p class="lede">You can buy GPUs in an afternoon. Running them takes a team: each vendor, site and tenant adds a toolchain, a runbook, an on-call rotation, and a line in a spreadsheet after the invoice. Work waits on the two people who know the cluster, while the hardware sits idle.</p>
+<div class="table" role="table" aria-label="What each purchase adds to operations">
+<div class="tr" role="row"><div class="th" role="columnheader">You buy</div><div class="th" role="columnheader">You also take on</div></div>
+<div class="tr" role="row"><div class="b" role="cell">A second vendor</div><div class="t" role="cell">A second toolchain, a second runbook, a second on-call rotation. The team that knows one stack does not know the other.</div></div>
+<div class="tr" role="row"><div class="b" role="cell">A new site</div><div class="t" role="cell">Another inventory, another metrics stack, another set of credentials, and no single view of what is actually running.</div></div>
+<div class="tr" role="row"><div class="b" role="cell">More tenants</div><div class="t" role="cell">Isolation to prove, quotas to enforce, spend to attribute. Usually reconciled in a spreadsheet, after the invoice.</div></div>
+<div class="tr" role="row"><div class="b" role="cell">More GPUs</div><div class="t" role="cell">Hours nobody has. Capacity sits idle because nobody has time to place work on it.</div></div>
+</div>
+<p class="lede">An AI agent is the obvious answer, and the obvious risk. A generic agent holds your keys, acts on its own say-so and reports success it never checked. Nobody hands production to that.</p>
+<p class="verdict">VibOps is the agent you can hand it to.</p>
+</div>
+</div></section>
 
-<!-- ── 2 ─────────────────────────────────────────────────────────────────── -->
-<section class="band" id="problem">
-  <div class="shell">
-    <div class="eyebrow">The problem</div>
-    <h2 style="margin-top:12px">Capacity scales. Operations don't.</h2>
-    <p class="prose" style="margin-top:14px">
-      Buying accelerators is a purchase order. Running them is a team. Capacity
-      now arrives faster than the ability to operate it — so the estate is held
-      back by the operator, not by the hardware. And an AI estate is never only
-      accelerators: services on VMs, inference on GPUs, on-prem and in cloud.
-      Every addition doubles a line below.
-    </p>
+<section class="sub" id="promises"><div class="wrap sec-grid">
+<div class="rail"><p class="label">Why you can let it act</p></div>
+<div class="body">
+<h2>Three guarantees, built into the platform.</h2>
+<p class="lede">An agent that can touch production has to earn it. These are not settings you turn on. They are how VibOps is built.</p>
+<div class="cols3">
+<div><span class="k">It never holds the keys</span><h3>Your credentials stay on site.</h3><p>A small gateway lives on your site and only calls out: no inbound port, no VPN. It holds the credentials. The model, whichever one you choose, never sees a secret.</p></div>
+<div><span class="k">It asks before it acts</span><h3>Anything that can break something waits for your approval.</h3><p>Before a risky action it shows you exactly what it is about to do, and stops. Your admins decide what needs an approval, and from whom.</p></div>
+<div><span class="k">It proves what it did</span><h3>Done means read back, never assumed.</h3><p>After every action it checks the real state and reports whether it is actually done. Everything lands in an audit trail that cannot be quietly edited, and your compliance reports are built from it.</p></div>
+</div>
+</div>
+</div></section>
 
-    <div class="ledger" role="list" aria-label="What each addition costs">
-      <div class="ledger-head" aria-hidden="true">
-        <span>You buy</span><span></span><span>You also take on</span>
-      </div>
-      <div class="ledger-row" role="listitem">
-        <span class="bought">A second vendor</span>
-        <span class="to" aria-hidden="true">→</span>
-        <span class="carries">A second toolchain, a second runbook, a second on-call rotation. The team that knows one stack does not know the other.</span>
-      </div>
-      <div class="ledger-row" role="listitem">
-        <span class="bought">A new site</span>
-        <span class="to" aria-hidden="true">→</span>
-        <span class="carries">Another inventory, another metrics stack, another set of credentials — and no single view of what is actually running.</span>
-      </div>
-      <div class="ledger-row" role="listitem">
-        <span class="bought">More tenants</span>
-        <span class="to" aria-hidden="true">→</span>
-        <span class="carries">Isolation to prove, quotas to enforce, and spend to attribute. Usually reconciled in a spreadsheet, after the invoice.</span>
-      </div>
-      <div class="ledger-row" role="listitem">
-        <span class="bought">More GPUs</span>
-        <span class="to" aria-hidden="true">→</span>
-        <span class="carries">Hours nobody has. Capacity sits idle not because it is unavailable, but because nobody has time to place work on it.</span>
-      </div>
-    </div>
+<section id="how"><div class="wrap sec-grid">
+<div class="rail"><p class="label">How it works</p></div>
+<div class="body">
+<h2>You ask. It checks. You approve. It acts, and proves it.</h2>
+<div class="process">
+<div><h3>You ask</h3><p>In the console, in plain language. Or from a schedule, a pipeline, an alert, or your editor over the MCP server.</p></div>
+<div><h3>It checks</h3><p>Your rules, your roles, your tenants. Anything risky comes back as a preview, not an action.</p></div>
+<div><h3>You approve</h3><p>Or someone else does. The agent cannot approve on your behalf, even if the model tries.</p></div>
+<div><h3>It acts and proves it</h3><p>The action runs on your site, the state is read back, the result is recorded and billed to the right team.</p></div>
+</div>
+</div>
+</div></section>
 
-    <p class="verdict">One control plane. The same operations, whatever is underneath.</p>
-  </div>
-</section>
+<section class="sub" id="proof"><div class="wrap sec-grid">
+<div class="rail"><p class="label">Product demo</p></div>
+<div class="body">
+<h2>Watch it work.</h2>
+<p class="lede">The real console, on real infrastructure. No mockup.</p>
+<div class="video"><video controls preload="metadata" poster="console.jpg"><source src="demo.mp4" type="video/mp4">Your browser cannot play this video.</video></div>
+<div class="chapters"><span>Deployment</span><span>GPU monitoring</span><span>Cost per tenant</span><span>Audit trail</span></div>
+</div>
+</div></section>
 
-<!-- ── 3 ─────────────────────────────────────────────────────────────────── -->
-<section class="section" id="mechanism">
-  <div class="shell">
-    <div class="eyebrow">How</div>
-    <h2>One request. Four vendors. No translation layer in your team's head.</h2>
-    <p class="prose" style="margin-top:14px">
-      Eleven operations carry the same name, the same payload, the same policy
-      check and the same audit record on NVIDIA, AMD, Intel and Groq. The
-      vendor difference lives below the line, where it belongs.
-    </p>
+<section id="capabilities"><div class="wrap sec-grid">
+<div class="rail"><p class="label">Capabilities</p></div>
+<div class="body">
+<h2>One console for GPUs, VMs and the agents that use them.</h2>
+<div class="caps">
+<div><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="5" width="14" height="14" rx="1"/><rect x="9" y="9" width="6" height="6"/><path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"/></svg><h3>GPU operations</h3><p>Inventory, health, saturation, anomaly detection and failure prediction across NVIDIA, AMD and Intel, with no per-machine agent.</p></div>
+<div><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="6" rx="1"/><rect x="3" y="14" width="18" height="6" rx="1"/><path d="M7 7h.01M7 17h.01"/></svg><h3>VM operations</h3><p>Proxmox, vSphere, Vates XCP-ng, Nutanix, HPE VME. Lifecycle, GPU passthrough, backup compliance, SLA tracking.</p></div>
+<div><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><h3>FinOps</h3><p>One cost model for GPU and VM alike. Per-tenant chargeback, configurable margin, budgets that block before the invoice does.</p></div>
+<div><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/></svg><h3>Agent FinOps</h3><p>An inference proxy: cost per agent, per model and per organisation, with ceilings that actually stop the spend.</p></div>
+<div><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg><h3>Governance</h3><p>Deny by default on any unknown action, mandatory preview before destruction, hash-chained and anchored audit trail.</p></div>
+<div><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21h18M5 21V9l7-5 7 5v12"/><rect x="9.5" y="13" width="5" height="8"/></svg><h3>Sovereignty</h3><p>On-prem, air-gap compatible, tenant isolation enforced by the database rather than by code discipline.</p></div>
+</div>
+</div>
+</div></section>
 
-    <div class="bus">
-      <code class="bus-call">accelerator_list_devices</code>
-      <div class="bus-wire" aria-hidden="true"></div>
-      <div class="lanes">
-        <div class="lane" style="--i:0">
-          <span class="lane-track" aria-hidden="true"></span>
-          <span class="lane-vendor">NVIDIA</span>
-          <span class="lane-what">H200 · 141 GB</span>
-          <span class="lane-where">nvidia.com/gpu</span>
-        </div>
-        <div class="lane" style="--i:1">
-          <span class="lane-track" aria-hidden="true"></span>
-          <span class="lane-vendor">AMD</span>
-          <span class="lane-what">MI300X · 192 GB</span>
-          <span class="lane-where">amd.com/gpu</span>
-        </div>
-        <div class="lane" style="--i:2">
-          <span class="lane-track" aria-hidden="true"></span>
-          <span class="lane-vendor">Intel</span>
-          <span class="lane-what">Gaudi 3 · 96 GB</span>
-          <span class="lane-where">gaudi.intel.com/accelerator</span>
-        </div>
-        <div class="lane" style="--i:3">
-          <span class="lane-track" aria-hidden="true"></span>
-          <span class="lane-vendor">Groq</span>
-          <span class="lane-what">LPU inference endpoints</span>
-          <span class="lane-where">api.groq.com</span>
-        </div>
-      </div>
-    </div>
+<section class="sub" id="runs"><div class="wrap sec-grid">
+<div class="rail"><p class="label">Integrations</p></div>
+<div class="body">
+<h2>It works with what you already run.</h2>
+<p class="lede">VibOps does not ask you to give up kubectl, vCenter or sbatch. It sits one layer above them: the same request, the same policy, the same audit record, whatever is underneath.</p>
+<div class="runs">
+<div>
+<div class="group"><p class="label">Accelerators</p><div class="tags"><span>NVIDIA H100 · H200 · Blackwell</span><span>AMD MI300X</span><span>Intel Gaudi 3</span><span>AWS Trainium</span><span>Google TPU</span><span>Groq LPU</span><span>Cerebras WSE</span></div></div>
+<div class="group"><p class="label">Platforms and hypervisors</p><div class="tags"><span>Kubernetes</span><span>Slurm</span><span>Ray · KubeRay</span><span>Proxmox</span><span>vSphere</span><span>Vates XCP-ng</span><span>Nutanix</span><span>HPE VME</span><span>Redfish</span></div></div>
+<div class="group"><p class="label">Models</p><div class="tags"><span>vLLM</span><span>Ollama</span><span>NVIDIA NIM</span><span>Anthropic</span><span>Any OpenAI-compatible endpoint</span></div></div>
+</div>
+<div class="term">
+<div class="h">one request · <b>accelerator_list_devices</b> · four answers</div>
+<div class="tbl"><table>
+<thead><tr><th>Vendor</th><th>Device</th><th>Resource</th></tr></thead>
+<tbody>
+<tr><td>NVIDIA</td><td>H200 · 141 GB</td><td><code>nvidia.com/gpu</code></td></tr>
+<tr><td>AMD</td><td>MI300X · 192 GB</td><td><code>amd.com/gpu</code></td></tr>
+<tr><td>Intel</td><td>Gaudi 3 · 96 GB</td><td><code>gaudi.intel.com/accelerator</code></td></tr>
+<tr><td>Groq</td><td>LPU inference endpoints</td><td><code>api.groq.com</code></td></tr>
+</tbody></table></div>
+<div class="f">Eleven operations carry the same name, the same payload, the same policy check and the same audit record on all four. The vendor difference stays below the line.</div>
+</div>
+</div>
+</div>
+</div></section>
 
-  </div>
-</section>
+<section id="who"><div class="wrap sec-grid">
+<div class="rail"><p class="label">Who it's for</p></div>
+<div class="body">
+<h2>Teams that own infrastructure, and those who serve it to others.</h2>
+<div class="aud">
+<div><span class="tag">Cloud · telco · datacenter · HPC</span><h3>GPU operators</h3><p>Turn raw compute into a managed platform. White-label console, per-tenant chargeback with configurable margin, enforceable budgets, multi-accelerator. Your customers deploy self-service and billing follows.</p></div>
+<div><span class="tag">Multi-site managed services</span><h3>Integrators and MSPs</h3><p>Operate your customers' VMs (Proxmox, vSphere, XCP-ng) and their GPU clusters from a single console, under each customer's rules. One operator covers ten sites instead of three.</p></div>
+<div><span class="tag">On-prem · cloud · hybrid</span><h3>Enterprises and platform teams</h3><p>Your ML teams are waiting on the two people who know the cluster. VibOps is the operator those two would hire, if it could be trusted. That is the point.</p></div>
+</div>
+</div>
+</div></section>
 
-<!-- ── 4 ─────────────────────────────────────────────────────────────────── -->
-<section class="section" id="who">
-  <div class="shell">
-    <div class="eyebrow">Who it's for</div>
-    <h2>Teams that own their infrastructure</h2>
+<section class="sub" id="model"><div class="wrap sec-grid">
+<div class="rail"><p class="label">Model choice</p></div>
+<div class="body">
+<h2>Change the model. Nothing changes about what it can touch.</h2>
+<p class="lede">Run VibOps on Claude, GPT or Mistral, or on a model served from your own GPUs that never leaves your network. The agent holds no credential: it emits an intent that VibOps authenticates and policy-checks. The guardrails belong to the platform, not to the model.</p>
+<div class="mtable">
+<div class="tr"><span>Claude, GPT, Mistral</span><span>hosted</span></div>
+<div class="tr"><span>vLLM, Ollama, NVIDIA NIM</span><span>on your own GPUs</span></div>
+<div class="tr"><span>Any OpenAI-compatible endpoint</span><span>bring your own</span></div>
+<div class="tr"><span>Every token metered, per agent</span><span>agent FinOps</span></div>
+</div>
+</div>
+</div></section>
 
-    <div class="spec">
-      <div class="spec-row">
-        <div>
-          <h3>GPU operators</h3>
-          <div class="scope">cloud · datacenter · HPC</div>
-        </div>
-        <p class="prose">
-          Turn raw compute into a managed platform. White-label console, per-tenant
-          chargeback with configurable margin, enforceable budgets, multi-accelerator.
-          Your customers deploy self-service; the billing follows.
-        </p>
-      </div>
+<section id="install"><div class="wrap sec-grid">
+<div class="rail"><p class="label">Getting started</p></div>
+<div class="body">
+<h2>Three steps. No agent on the compute machines.</h2>
+<p class="lede">VibOps sits beside your infrastructure, not in front of it.</p>
+<div class="steps3">
+<div><span class="k">Step 1</span><h3>Deploy the control plane</h3><p>A self-hosted stack, on your own ground.</p><div class="cmd"><b>$</b>curl -fsSL https://vibops.ai/install.sh | bash</div></div>
+<div><span class="k">Step 2</span><h3>Connect your sites</h3><p>One lightweight gateway per site. It discovers the clusters, the GPUs and the hypervisors on its own, and changes nothing you have not confirmed.</p></div>
+<div><span class="k">Step 3</span><h3>Operate</h3><p>From the console, or from your editor over the MCP server. The <a href="https://github.com/VibOpsai/vibops-mcp">MCP server</a> and the <a href="https://github.com/VibOpsai/vibops-sdk">Python SDK</a> are public and MIT-licensed.</p><div class="cmd"><b>$</b>pip install vibops-mcp</div></div>
+</div>
+</div>
+</div></section>
 
-      <div class="spec-row">
-        <div>
-          <h3>Integrators and MSPs</h3>
-          <div class="scope">multi-site managed services</div>
-        </div>
-        <p class="prose">
-          Operate your customers' VMs — Proxmox, vSphere, XCP-ng — and their GPU
-          clusters from a single console. Proactive anomaly detection, backup
-          compliance, SLA tracking. One operator holds ten sites instead of three.
-        </p>
-      </div>
+<section class="cta" id="access"><div class="wrap grid">
+<div class="left"><p class="label">Access</p><h2>You operate GPUs. Let's talk.</h2><p class="lede">We open access in waves, so that every install gets attention. Tell us what you run.</p></div>
+<form id="waitlistForm">
+<label for="emailInput">Work email</label>
+<div class="frow"><input id="emailInput" type="email" placeholder="name@company.com" required><button class="btn" id="submitBtn" type="submit">Request access</button></div>
+<p class="note" id="formNote">No cold outreach. A personal reply.</p>
+</form>
+</div></section>
+</main>
 
-      <div class="spec-row">
-        <div>
-          <h3>Enterprises</h3>
-          <div class="scope">on-prem · cloud · hybrid</div>
-        </div>
-        <p class="prose">
-          Operate GPU and VM without demanding Kubernetes expertise at every level.
-          SOC 2 audit trail, multi-vendor fleet, the same gestures everywhere.
-        </p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ── 5 ─────────────────────────────────────────────────────────────────── -->
-<section class="section proof" id="proof">
-  <div class="shell">
-    <div class="eyebrow">The proof</div>
-    <h2>Watch it work</h2>
-    <p class="prose" style="margin-top:14px">
-      No mockup: the real console, on real infrastructure.
-    </p>
-
-    <div class="player">
-      <video controls preload="metadata" playsinline poster="console.jpg"
-             aria-label="VibOps demonstration: deploying and monitoring from the console.">
-        <source src="demo.mp4" type="video/mp4">
-        Your browser cannot play this video.
-      </video>
-    </div>
-    <div class="under-video">
-      <span>deployment</span><span>GPU monitoring</span><span>cost per tenant</span><span>audit trail</span>
-    </div>
-  </div>
-</section>
-
-<!-- ── 6 ─────────────────────────────────────────────────────────────────── -->
-<section class="section" id="capabilities">
-  <div class="shell">
-    <div class="eyebrow">Capabilities</div>
-    <h2>What the console holds</h2>
-
-    <dl class="matrix">
-      <div class="matrix-row">
-        <dt>GPU Ops</dt>
-        <dd>Inventory, health, saturation, anomaly detection and failure prediction across NVIDIA, AMD and Intel — with no per-machine agent.</dd>
-      </div>
-      <div class="matrix-row">
-        <dt>VM Ops</dt>
-        <dd>Proxmox, vSphere, Vates XCP-ng, Nutanix. Lifecycle, GPU passthrough, backup compliance, SLA tracking.</dd>
-      </div>
-      <div class="matrix-row">
-        <dt>FinOps</dt>
-        <dd>One cost model for GPU and VM alike. Per-tenant chargeback, configurable margin, budgets that block before the invoice does.</dd>
-      </div>
-      <div class="matrix-row">
-        <dt>Agent FinOps</dt>
-        <dd>An inference proxy: cost per agent, per model and per organisation, with ceilings that actually stop the spend.</dd>
-      </div>
-      <div class="matrix-row">
-        <dt>Your own LLM</dt>
-        <dd>The Infrastructure Agent runs on the model you choose — Claude, Ollama, NVIDIA NIM or any OpenAI-compatible endpoint, including one served from your own GPUs. The agent holds no credential: it emits an intent that VibOps authenticates and policy-checks, so changing model does not change what is exposed.</dd>
-      </div>
-      <div class="matrix-row">
-        <dt>Governance</dt>
-        <dd>Deny by default on any unknown action, mandatory preview before destruction, hash-chained and anchored audit trail.</dd>
-      </div>
-      <div class="matrix-row">
-        <dt>Sovereignty</dt>
-        <dd>On-prem, air-gap compatible, tenant isolation enforced by the database rather than by code discipline.</dd>
-      </div>
-    </dl>
-  </div>
-</section>
-
-<!-- ── 7 ─────────────────────────────────────────────────────────────────── -->
-<section class="band">
-  <div class="shell">
-    <div class="eyebrow">Silicon</div>
-    <h2 style="margin-top:12px">It speaks to what you already have</h2>
-    <div class="silicon">
-      <span>NVIDIA H100 · H200 · Blackwell</span>
-      <span>AMD MI300X</span>
-      <span>Intel Gaudi 3</span>
-      <span>AWS Trainium</span>
-      <span>Google TPU</span>
-      <span>Groq LPU</span>
-      <span>Cerebras WSE</span>
-    </div>
-    <div class="silicon" style="margin-top:14px">
-      <span>Kubernetes</span><span>Slurm</span><span>Proxmox</span><span>vSphere</span>
-      <span>Vates XCP-ng</span><span>Nutanix</span><span>HPE VME</span><span>Redfish</span>
-    </div>
-    <div class="silicon" style="margin-top:14px">
-      <span>vLLM</span><span>Ollama</span><span>NVIDIA NIM</span>
-      <span>Anthropic</span><span>any OpenAI-compatible endpoint</span>
-    </div>
-  </div>
-</section>
-
-<!-- ── 8 ─────────────────────────────────────────────────────────────────── -->
-<section class="section" id="install">
-  <div class="shell">
-    <div class="eyebrow">Getting started</div>
-    <h2>Three steps</h2>
-    <p class="prose" style="margin-top:14px">
-      VibOps sits beside your infrastructure, not in front of it. No agent on the
-      compute machines.
-    </p>
-
-    <div class="steps">
-      <div class="step">
-        <div class="step-num">01</div>
-        <div>
-          <h3>Deploy the control plane</h3>
-          <p class="prose" style="margin-top:4px">A self-hosted stack, on your own ground.</p>
-          <pre class="command"><span class="prompt">$ </span>curl -fsSL https://vibops.ai/install.sh | bash</pre>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num">02</div>
-        <div>
-          <h3>Connect your sites</h3>
-          <p class="prose" style="margin-top:4px">
-            One lightweight gateway per site. It discovers the clusters, the GPUs and
-            the hypervisors on its own — and proposes nothing you have not confirmed.
-          </p>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num">03</div>
-        <div>
-          <h3>Operate</h3>
-          <p class="prose" style="margin-top:4px">
-            From the console, or from your editor over the MCP server. The MCP
-            server and the Python SDK are public and MIT-licensed:
-            <a href="https://github.com/VibOpsai/vibops-mcp">vibops-mcp</a> and
-            <a href="https://github.com/VibOpsai/vibops-sdk">vibops-sdk</a>.
-          </p>
-          <pre class="command"><span class="prompt">$ </span>pip install vibops-mcp</pre>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ── 9 ─────────────────────────────────────────────────────────────────── -->
-<section class="call" id="access">
-  <div class="shell">
-    <div class="eyebrow">Access</div>
-    <h2 style="margin-top:12px">You operate GPUs.<br>Let's talk.</h2>
-    <p class="prose" style="text-align:left">
-      We open access in waves, so that every install gets attention. Tell us what
-      you run.
-    </p>
-    <form class="access" id="waitlistForm">
-      <label class="visually-hidden" for="emailInput">Work email address</label>
-      <input id="emailInput" name="email" type="email" placeholder="you@company.com"
-             required autocomplete="email" aria-describedby="accessNote">
-      <button class="button" id="submitBtn" type="submit">Request access</button>
-    </form>
-    <p class="note" id="accessNote">No cold outreach. A personal reply.</p>
-  </div>
-</section>
-
-<footer class="foot">
-  <div class="shell">
-    <div class="foot-links">
-      <a class="repo" href="https://github.com/VibOpsai/vibops-mcp">MCP server · MIT</a>
-      <a class="repo" href="https://github.com/VibOpsai/vibops-sdk">Python SDK · MIT</a>
-      <a href="#install">Install</a>
-      <a href="#capabilities">Capabilities</a>
-    </div>
-    <p class="foot-mark">© 2026 <b>VibOps</b> · Montréal, Canada</p>
-  </div>
-</footer>
+<footer class="foot"><div class="wrap">
+<div class="cols">
+<div><a class="wordmark" href="#top"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#3D8BFF"/><path d="M18 18l14 30 14-30" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="wm">Vib<b>Ops</b></span></a><p style="margin-top:12px;max-width:32ch">The AI agent for infrastructure operations. Self-hosted, auditable, model-agnostic.</p></div>
+<div><h4>Product</h4><ul><li><a href="#capabilities">Capabilities</a></li><li><a href="#how">How it works</a></li><li><a href="#proof">Demo</a></li></ul></div>
+<div><h4>Developers</h4><ul><li><a href="#install">Install</a></li><li><a href="https://github.com/VibOpsai/vibops-mcp">MCP server · MIT</a></li><li><a href="https://github.com/VibOpsai/vibops-sdk">Python SDK · MIT</a></li></ul></div>
+<div><h4>Company</h4><ul><li><a href="#who">Who it's for</a></li><li><a href="#access">Request access</a></li></ul></div>
+</div>
+<div class="legal"><span>© VibOps</span><span>Montréal, Canada</span></div>
+</div></footer>
 
 <script>
-  // Same Formspree endpoint the previous page used. The failure path writes into
-  // the note under the form rather than raising an alert(): a dialog the visitor
+  // Same Formspree endpoint as before. Every state is written into the note
+  // under the field rather than raised as an alert(): a dialog the visitor
   // has to dismiss tells them less than a line saying what to do next.
   (function () {
     var form = document.getElementById('waitlistForm');
     var email = document.getElementById('emailInput');
     var btn = document.getElementById('submitBtn');
-    var note = document.getElementById('accessNote');
-
-    // An empty field stops the submit event from firing at all — the browser
-    // refuses it first and shows a bubble that vanishes on the next click.
-    // From the visitor's side that is a button that does nothing, so the
-    // refusal is mirrored into the note, which stays put.
+    var note = document.getElementById('formNote');
+    var ERR = '#FFB4A8', OK = '#7EE2A8';
     var REST = note.textContent;
+    // An empty field stops the submit event from firing: the browser refuses
+    // it first and shows a bubble that vanishes on the next click. The
+    // refusal is mirrored into the note, which stays put.
     email.addEventListener('invalid', function () {
-      note.textContent = email.value
-        ? 'That does not look like an email address.'
-        : 'Enter your work email first.';
-      note.style.color = 'var(--critical)';
+      note.textContent = email.value ? 'That does not look like an email address.' : 'Enter your work email first.';
+      note.style.color = ERR;
     });
     email.addEventListener('input', function () {
       if (note.style.color) { note.textContent = REST; note.style.color = ''; }
     });
-
     form.addEventListener('submit', async function (e) {
       e.preventDefault();
       btn.disabled = true;
       btn.textContent = 'Sending\u2026';
       note.style.color = '';
-
       try {
         var r = await fetch('https://formspree.io/f/xkokbpby', {
           method: 'POST',
@@ -975,18 +495,18 @@
           body: JSON.stringify({ email: email.value }),
         });
         if (!r.ok) throw new Error('HTTP ' + r.status);
-        form.hidden = true;
+        form.querySelector('.frow').hidden = true;
+        form.querySelector('label').hidden = true;
         note.textContent = 'Noted. We will come back to you shortly.';
-        note.style.color = 'var(--healthy)';
+        note.style.color = OK;
       } catch (err) {
         btn.disabled = false;
         btn.textContent = 'Request access';
         note.textContent = 'That did not go through. Try again, or write to david@vibops.ai.';
-        note.style.color = 'var(--critical)';
+        note.style.color = ERR;
       }
     });
   })();
 </script>
-
 </body>
 </html>
