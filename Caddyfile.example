@@ -28,7 +28,7 @@
   # ping, jobs, jobs/{id}/claim, jobs/{id}/result), et tous s'authentifient par
   # jeton de passerelle. Le motif large `/api/v1/gateways/*` couvrait aussi des
   # routes a session, qui arrivaient alors a core sans identite.
-  @connect path_regexp ^/api/v1/gateways/[^/]+/(ping|jobs)(/.*)?$
+  @connect path_regexp ^/api/v1/gateways/[^/]+/(ping|jobs|events)(/.*)?$
   handle @connect {
     reverse_proxy core:8000
   }

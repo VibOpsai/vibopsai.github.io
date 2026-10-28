@@ -20,7 +20,7 @@ set -euo pipefail
 # ─────────────────────────────────────────────────────────────────────────────
 
 VIBOPS_DIR="/opt/vibops"
-VIBOPS_VERSION="${VIBOPS_VERSION:-v0.63.0}"
+VIBOPS_VERSION="${VIBOPS_VERSION:-v0.63.1}"
 LLM_API_KEY="${LLM_API_KEY:-}"
 LLM_MODEL="${LLM_MODEL:-claude-sonnet-5}"
 LLM_PROVIDER="${LLM_PROVIDER:-claude}"
@@ -252,7 +252,7 @@ ${SITE_ADDRESS} {
   # et non celle de l'operateur, et affichait « — » sur le seul cluster qui a
   # un GPU. Constate sur la demo le 30/09/2026, depuis l'internet public et
   # sans aucune authentification.
-  @connect path_regexp ^/api/v1/gateways/[^/]+/(ping|jobs)(/.*)?$
+  @connect path_regexp ^/api/v1/gateways/[^/]+/(ping|jobs|events)(/.*)?$
   handle @connect {
     reverse_proxy core:8000
   }
