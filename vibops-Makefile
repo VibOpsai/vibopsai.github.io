@@ -53,7 +53,7 @@ quickstart:
 		echo ""; \
 		echo "  Edit .env and set:"; \
 		echo "    LLM_PROVIDER + LLM_API_KEY  (or set LLM_PROVIDER=ollama for local LLM)"; \
-		echo "    AUTH_PASSWORD_HASH          (run: make hash PASSWORD=yourpassword)"; \
+		echo "    then create your organisation and admin account with make pilot-create-client"; \
 		echo ""; \
 	fi
 	docker compose up -d
@@ -70,14 +70,10 @@ quickstart:
 	@echo "       LLM_PROVIDER=openai   → add LLM_API_KEY + LLM_BASE_URL"
 	@echo "       LLM_PROVIDER=ollama   → no key needed"
 	@echo ""
-	@echo "  2. Create your admin account:"
-	@echo "       make hash PASSWORD=yourpassword"
-	@echo "       → paste the result into AUTH_PASSWORD_HASH in .env"
-	@echo ""
-	@echo "  3. Create your organisation:"
+	@echo "  2. Create your organisation and its admin account:"
 	@echo "       make pilot-create-client ORG=\"My Company\" EMAIL=you@company.com PASSWORD=yourpassword"
 	@echo ""
-	@echo "  4. Apply your .env changes to the agent:"
+	@echo "  3. Apply your .env changes to the agent:"
 	@echo "       docker compose up -d agent"
 	@echo "       (up -d, not restart: restart reuses the container's old"
 	@echo "        environment and does not re-read .env)"
