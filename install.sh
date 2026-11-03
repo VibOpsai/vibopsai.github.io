@@ -20,7 +20,7 @@ set -euo pipefail
 # ─────────────────────────────────────────────────────────────────────────────
 
 VIBOPS_DIR="/opt/vibops"
-VIBOPS_VERSION="${VIBOPS_VERSION:-v0.70.0}"
+VIBOPS_VERSION="${VIBOPS_VERSION:-v0.70.1}"
 LLM_API_KEY="${LLM_API_KEY:-}"
 LLM_MODEL="${LLM_MODEL:-claude-sonnet-5}"
 LLM_PROVIDER="${LLM_PROVIDER:-claude}"
@@ -294,8 +294,10 @@ if [[ ! -f .env ]]; then
   APP_ROLE_PASSWORD=$(openssl rand -hex 24)
   SECRET_KEY=$(openssl rand -hex 32)
   JWT_SECRET_KEY=$(openssl rand -base64 32)
+  # Fernet wants 32 bytes in URL-safe base64: plain `openssl rand -base64` carries
+  # '+' or '/' about one time in three and core then refuses the key at start-up.
   VAULT_KEY=$(python3 -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())" 2>/dev/null \
-    || openssl rand -base64 32)
+    || openssl rand -base64 32 | tr '+/' '-_')
   INTERNAL_API_KEY=$(openssl rand -hex 32)
   GRAFANA_PASSWORD=$(openssl rand -base64 16)
   # Chiffre les archives de sauvegarde. Elle n'existe que dans ce .env : le

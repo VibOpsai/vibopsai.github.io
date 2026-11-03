@@ -22,6 +22,12 @@
 # ./Caddyfile absent, Docker cree un REPERTOIRE a sa place et caddy meurt sur
 # « Are you trying to mount a directory onto a file ». Reproduit le 01/10/2026
 # sur l'hote de validation : `make: *** [quickstart] Error 1`.
+# VAULT_KEY: a Fernet key — 32 random bytes, URL-safe base64 — generated like the
+# other secrets. Until 03/11/2026 it was left empty, and every write to the
+# secret vault answered 500 on a quickstart install: the onboarding wizard's
+# first step (the AI provider) and every hypervisor credential failed. Measured
+# on a fresh install that day. `openssl rand -base64` alone is not URL-safe and
+# Fernet refuses a key carrying '+' or '/', hence the `tr`.
 quickstart:
 	@if [ ! -f Caddyfile ]; then cp Caddyfile.example Caddyfile; \
 		echo "→ Caddyfile created from Caddyfile.example (HTTP on :80 — set your domain for HTTPS)"; \
@@ -37,6 +43,7 @@ quickstart:
 		GRAFPASS=$$(openssl rand -hex 12); \
 		REDISPASS=$$(openssl rand -hex 24); \
 		BACKUPPASS=$$(openssl rand -hex 32); \
+		VAULT=$$(openssl rand -base64 32 | tr '+/' '-_'); \
 		sed -i.bak "s/change-me-in-production/$$SECRET/" .env; \
 		sed -i.bak "s/change-me-jwt-secret-in-production/$$JWT/" .env; \
 		sed -i.bak "s/^POSTGRES_PASSWORD=$$/POSTGRES_PASSWORD=$$PGPASS/" .env; \
@@ -45,8 +52,9 @@ quickstart:
 		sed -i.bak "s/^REDIS_PASSWORD=$$/REDIS_PASSWORD=$$REDISPASS/" .env; \
 		sed -i.bak "s|\$${REDIS_PASSWORD}|$$REDISPASS|g" .env; \
 		sed -i.bak "s/^BACKUP_PASSPHRASE=$$/BACKUP_PASSPHRASE=$$BACKUPPASS/" .env; \
+		sed -i.bak "s|^VAULT_KEY=$$|VAULT_KEY=$$VAULT|" .env; \
 		rm -f .env.bak; \
-		echo "→ SECRET_KEY, JWT_SECRET_KEY, POSTGRES_PASSWORD, REDIS_PASSWORD, GRAFANA_PASSWORD and BACKUP_PASSPHRASE generated"; \
+		echo "→ SECRET_KEY, JWT_SECRET_KEY, VAULT_KEY, POSTGRES_PASSWORD, REDIS_PASSWORD, GRAFANA_PASSWORD and BACKUP_PASSPHRASE generated"; \
 		echo ""; \
 		echo "  ⚠ BACKUP_PASSPHRASE encrypts your nightly backups and exists only in .env."; \
 		echo "    Keep a copy of .env off this machine, or a restore will not be possible."; \
